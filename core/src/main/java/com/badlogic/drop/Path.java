@@ -1,0 +1,75 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.badlogic.drop;
+
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+
+/**
+ *
+ * @author tdewe
+ */
+public class Path {
+    Array<Vector2> pathPoints;
+    Texture waypointTexture;
+    Sprite waypointSpriteDefault;
+    FitViewport viewport;
+    Array<Sprite> waypointSpriteArray;
+    
+    
+    public Path() {
+        pathPoints = new Array<>();
+        waypointSpriteArray = new Array<>();
+        waypointTexture = new Texture("dotWaypoint.png");
+        waypointSpriteDefault = new Sprite(waypointTexture);
+        waypointSpriteDefault.setSize(0.1f, 0.1f);
+        viewport = new FitViewport(8,5);
+    }
+    
+    /**
+     * createPath sets the path coordinates for the class to use for path following
+     * 
+     * @author tdewe
+     */
+    public void createPath() {
+        viewport.apply();
+        float worldWidth = viewport.getWorldWidth();
+        float worldHeight = viewport.getWorldHeight();
+        
+        pathPoints.add(new Vector2(0f, (worldHeight/2)));
+        pathPoints.add(new Vector2((worldWidth/3), (worldHeight/2)));
+        pathPoints.add(new Vector2((worldWidth/3), (worldHeight/4)));
+        pathPoints.add(new Vector2((2*worldWidth/3), (worldHeight/4)));
+        pathPoints.add(new Vector2((2*worldWidth/3), (worldHeight/2)));
+        pathPoints.add(new Vector2((4*worldWidth/5), (worldHeight/2)));
+        
+    }
+    
+    /**
+     * createWaypoints creates the visual waypoints used for testing the path following algorithm
+     * 
+     * @author tdewe
+     */    
+    public void createWaypoints() {
+        //For loop to create the number of waypointSprites equal to the number of pathPoints
+        float waypointWidth = 0.1f;
+        float waypointHeight = 0.1f;
+        float waypointSpriteWidth = waypointSpriteDefault.getWidth();
+        float waypointSpriteHeight = waypointSpriteDefault.getHeight();
+        
+        for (int i = 0; i < pathPoints.size; i++) {
+            Sprite waypointSprite = new Sprite (waypointTexture);
+            waypointSprite.setSize(waypointWidth, waypointHeight);
+            waypointSprite.setX((pathPoints.get(i).x) - waypointSpriteWidth/2);
+            waypointSprite.setY((pathPoints.get(i).y) - waypointSpriteHeight/2);
+            waypointSpriteArray.add(waypointSprite);
+        }
+    }
+    
+    
+}
