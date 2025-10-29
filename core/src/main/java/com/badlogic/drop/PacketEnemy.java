@@ -47,6 +47,9 @@ public class PacketEnemy extends Enemy {
         maxVelocity = 3f; //Constant that will be determined through testing
     }
     
+    /**
+     * updateMovement updates the position of the enemy along with its rectangle
+     */
     public void updateMovement() {
         super.updateMovement(this);
     }

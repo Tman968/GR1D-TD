@@ -6,6 +6,7 @@ package com.badlogic.drop;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -20,11 +21,13 @@ public class Path {
     Sprite waypointSpriteDefault;
     FitViewport viewport;
     Array<Sprite> waypointSpriteArray;
+    Array<Rectangle> waypointRectangleArray;
     
     
     public Path() {
         pathPoints = new Array<>();
         waypointSpriteArray = new Array<>();
+        waypointRectangleArray = new Array<>();
         waypointTexture = new Texture("dotWaypoint.png");
         waypointSpriteDefault = new Sprite(waypointTexture);
         waypointSpriteDefault.setSize(0.1f, 0.1f);
@@ -64,9 +67,12 @@ public class Path {
         
         for (int i = 0; i < pathPoints.size; i++) {
             Sprite waypointSprite = new Sprite (waypointTexture);
+            Rectangle waypointRectangle = new Rectangle();
             waypointSprite.setSize(waypointWidth, waypointHeight);
             waypointSprite.setX((pathPoints.get(i).x) - waypointSpriteWidth/2);
             waypointSprite.setY((pathPoints.get(i).y) - waypointSpriteHeight/2);
+            waypointRectangle.set(waypointSprite.getX(), waypointSprite.getY(), waypointSprite.getWidth(), waypointSprite.getHeight());
+            waypointRectangleArray.add(waypointRectangle);
             waypointSpriteArray.add(waypointSprite);
         }
     }

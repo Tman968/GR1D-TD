@@ -2,7 +2,6 @@ package com.badlogic.drop;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -19,6 +18,9 @@ public class Main implements ApplicationListener {
     
     PacketEnemy testPacket;
     FitViewport viewport;
+    //Movement update variable(s)
+    float touchDetectTimer;
+    boolean spriteOverlapWaypoint;
     
     Texture backgroundTexture;
     
@@ -44,6 +46,8 @@ public class Main implements ApplicationListener {
         testPacket = new PacketEnemy();
         viewport = new FitViewport(8,5);
         spriteBatch = new SpriteBatch();
+        touchDetectTimer = 0f;
+        spriteOverlapWaypoint = false;
         
         backgroundTexture = new Texture("background.png");
         
@@ -91,7 +95,17 @@ public class Main implements ApplicationListener {
     }
     
     private void logic() {
-        
+        float delta = Gdx.graphics.getDeltaTime();
+        touchDetectTimer += delta;
+        if (touchDetectTimer > 0.5f)
+        {
+            for (int i = 0; i < path.waypointRectangleArray.size; i++) {
+                if (testPacket.enemyRectangle.overlaps(path.waypointRectangleArray.get(i)) & i < path.waypointRectangleArray.size-1 ) {
+                    testPacket.ChangeVelocity(testPacket, path.waypointRectangleArray.get(i) , path.waypointRectangleArray.get(i+1));
+                    touchDetectTimer = 0f;
+                }
+            }
+        }
         testPacket.updateMovement();
     }
     

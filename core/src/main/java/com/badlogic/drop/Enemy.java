@@ -7,6 +7,7 @@ package com.badlogic.drop;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -30,10 +31,13 @@ public class Enemy {
     FitViewport viewport;
     float worldWidth;
     float worldHeight;
+    
     //Default Textures and Sprites
     Texture enemyTexture;
     Sprite enemySprite;
     
+    //Enemy Hitbox
+    Rectangle enemyRectangle;
     
     /**
          * Constructor for the tower superclass, setting default values.
@@ -59,6 +63,7 @@ public class Enemy {
         enemySprite.setSize(1, 1);
         enemySprite.setX(location.x);
         enemySprite.setY(location.y);
+        enemyRectangle = new Rectangle();
         
         //Setting default values for variables
         health = 0;
@@ -71,21 +76,54 @@ public class Enemy {
      * changes velocity based on the location of two waypoints
      * @param waypointStart as starting waypoint
      * @param waypointEnd as ending waypoint
+     * @param inputEnemy the Enemy that velocity is being changed
      */
-    public void ChangeVelocity(Sprite waypointStart, Sprite waypointEnd) {
+    public void ChangeVelocity(Enemy inputEnemy, Rectangle waypointStart, Rectangle waypointEnd) {
+        float speedVel = 0f;
         //Setting up vectors for changing the enemy velocity later
         Vector2 startLocation = new Vector2();
         Vector2 endLocation = new Vector2();
         startLocation.x = (waypointStart.getX() - waypointStart.getWidth()/2);
         startLocation.y = (waypointStart.getY() - waypointStart.getHeight()/2);
+        endLocation.x = (waypointEnd.getX() - waypointEnd.getWidth()/2);
+        endLocation.y = (waypointEnd.getY() - waypointEnd.getHeight()/2);
         
+        // Setting speed to velocity
+        if (velocity.x != 0) {
+            speedVel = velocity.x;
+        }
+        else {
+            speedVel = velocity.y;
+        }
         
+        if (startLocation.x == endLocation.x) {
+            // changing velocity to move along the y-axis
+            // Checking if endpoint is above/below the startpoint
+            velocity.x = 0f;
+            if (startLocation.y < endLocation.y) {
+                velocity.y = speedVel;
+            }
+            else {
+                velocity.y = -speedVel;
+            }
+        }
+        else {
+            // changing velocity to move along the x-axis
+            if (speedVel < 0) {
+                speedVel = -speedVel;
+            }
+            velocity.x = speedVel;
+            velocity.y = 0f;
+        }
+        
+        System.out.println("Velocity x = " + velocity.x + "     Velocity y = " + velocity.y);
     }
     
     public void updateMovement(Enemy inputEnemy) {
         float delta = Gdx.graphics.getDeltaTime();
         enemySprite.translateX(delta * velocity.x);
         enemySprite.translateY(delta * velocity.y);
+        enemyRectangle.set(enemySprite.getX(), enemySprite.getY(), enemySprite.getWidth()/2, enemySprite.getHeight()/2);
     }
     
     /**
