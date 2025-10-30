@@ -42,6 +42,7 @@ public class PacketEnemy extends Enemy {
         speed = 0;
         velocity.x = 1f;
         velocity.y = 0f;
+        percentageUpdate = 0.01f;
         //Max velocity may not be used in the program, as a constant speed may be used
         // (no acceleration)
         maxVelocity = 3f; //Constant that will be determined through testing
@@ -52,5 +53,13 @@ public class PacketEnemy extends Enemy {
      */
     public void updateMovement() {
         super.updateMovement(this);
+    }
+    
+    public float touchDetectTimer() {
+        return super.getTouchDetect(this);
+    }
+    
+    public void resetTouchDetect() {
+        super.resetTouchDetect(this);
     }
 }

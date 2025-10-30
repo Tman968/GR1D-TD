@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -19,8 +20,11 @@ public class Main implements ApplicationListener {
     PacketEnemy testPacket;
     FitViewport viewport;
     //Movement update variable(s)
-    float touchDetectTimer;
+    float timerVar;
+    float addPacketTimer;
     boolean spriteOverlapWaypoint;
+    
+    Array<PacketEnemy> packetArray;
     
     Texture backgroundTexture;
     
@@ -46,7 +50,8 @@ public class Main implements ApplicationListener {
         testPacket = new PacketEnemy();
         viewport = new FitViewport(8,5);
         spriteBatch = new SpriteBatch();
-        touchDetectTimer = 0f;
+        timerVar = 0f;
+        addPacketTimer = 0f;
         spriteOverlapWaypoint = false;
         
         backgroundTexture = new Texture("background.png");
@@ -56,6 +61,8 @@ public class Main implements ApplicationListener {
         path = new Path();
         path.createPath();
         path.createWaypoints();
+        
+        packetArray = new Array<>();
         
         
     }
@@ -89,24 +96,36 @@ public class Main implements ApplicationListener {
         {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY()); // get location of touch
             viewport.unproject(touchPos); //Convert units to world units
-            testPacket.enemySprite.setCenterX(touchPos.x); //change the horizontally centered position of the bucket
-            testPacket.enemySprite.setCenterY(touchPos.y);
+            //testPacket.enemySprite.setCenterX(touchPos.x); //change the horizontally centered position of the bucket
+            //testPacket.enemySprite.setCenterY(touchPos.y);
         }
     }
     
     private void logic() {
         float delta = Gdx.graphics.getDeltaTime();
-        touchDetectTimer += delta;
-        if (touchDetectTimer > 0.5f)
-        {
-            for (int i = 0; i < path.waypointRectangleArray.size; i++) {
-                if (testPacket.enemyRectangle.overlaps(path.waypointRectangleArray.get(i)) & i < path.waypointRectangleArray.size-1 ) {
-                    testPacket.ChangeVelocity(testPacket, path.waypointRectangleArray.get(i) , path.waypointRectangleArray.get(i+1));
-                    touchDetectTimer = 0f;
+        timerVar += delta;
+        addPacketTimer += delta;
+        
+        if (addPacketTimer > 3.0f & packetArray.size < 3) {
+            createPacket();
+            addPacketTimer = 0f;
+        }
+        
+        for (PacketEnemy testPacketIn : packetArray) {
+            if (testPacketIn.getTouchDetect(testPacketIn) > 0.5f)
+            {
+                for (int i = 0; i < path.waypointRectangleArray.size; i++) {
+                    if (testPacketIn.enemyRectangle.overlaps(path.waypointRectangleArray.get(i)) & i < path.waypointRectangleArray.size-1 ) {
+                        testPacketIn.ChangeVelocity(testPacketIn, path.waypointRectangleArray.get(i) , path.waypointRectangleArray.get(i+1));
+                        testPacketIn.resetTouchDetect();
+                    }
                 }
             }
+
+
+            testPacketIn.updateMovement();
         }
-        testPacket.updateMovement();
+        
     }
     
     private void draw() {
@@ -121,14 +140,25 @@ public class Main implements ApplicationListener {
         float worldHeight = viewport.getWorldHeight();
         
         spriteBatch.draw(backgroundTexture, 0,0, worldWidth, worldHeight);
-        testPacket.enemySprite.draw(spriteBatch);
+        //testPacket.enemySprite.draw(spriteBatch);
         
         for (Sprite waypointSprite : path.waypointSpriteArray) {
             waypointSprite.draw(spriteBatch);
         }
         
+        for (PacketEnemy packet : packetArray) {
+            packet.enemySprite.draw(spriteBatch);
+        }
         
         spriteBatch.end();
+    }
+    /**
+     * createPacket spawns a packet enemy into the array of packet enemies
+     * @author tdewe
+     */
+    private void createPacket() {
+        PacketEnemy packet = new PacketEnemy();
+        packetArray.add(packet);
     }
 
     @Override

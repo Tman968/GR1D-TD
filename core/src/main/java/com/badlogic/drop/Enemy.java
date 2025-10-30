@@ -18,14 +18,16 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 public class Enemy {
     
     float health;
-    float speed; //Maybe int? Could call it velocity and make it a vector
+    float speed;
     Vector2 velocity;
     float maxVelocity;
+    float touchDetectTimer;
     
     Vector2 location;
     Vector2 currentTile;
     
     float percentage; // percentage along track
+    float percentageUpdate;
     
     // viewport variables
     FitViewport viewport;
@@ -69,6 +71,9 @@ public class Enemy {
         health = 0;
         speed = 0;
         maxVelocity = 0;
+        percentage = 0f;
+        percentageUpdate = 0f;
+        touchDetectTimer = 0f;
         
     }
     
@@ -118,21 +123,41 @@ public class Enemy {
         
         System.out.println("Velocity x = " + velocity.x + "     Velocity y = " + velocity.y);
     }
-    
+    /**
+     * updateMovement sets the velocity (x,y) of the enemy
+     * @param inputEnemy 
+     * @author tdewe
+     */
     public void updateMovement(Enemy inputEnemy) {
         float delta = Gdx.graphics.getDeltaTime();
         enemySprite.translateX(delta * velocity.x);
         enemySprite.translateY(delta * velocity.y);
-        enemyRectangle.set(enemySprite.getX(), enemySprite.getY(), enemySprite.getWidth()/2, enemySprite.getHeight()/2);
+        // keeps the enemy hitbox (Rectangle) centered along the path
+        if (velocity.y >= 0)
+        {
+            enemyRectangle.set(enemySprite.getX(), enemySprite.getY(), enemySprite.getWidth()/2, enemySprite.getHeight()/2);
+        }
+        else {
+            enemyRectangle.set(enemySprite.getX() + enemySprite.getWidth()/2, enemySprite.getY()+enemySprite.getHeight()/2, enemySprite.getWidth()/2, enemySprite.getHeight()/2);
+        }
+        percentage += percentageUpdate;
+        touchDetectTimer += delta;
     }
     
     /**
      * Subtracts specified damage from health
      * @param damage as int damage taken
+     * @return isDead
      */
-    public void TakeDamage(int damage) {
+    public boolean takeDamage(int damage) {
+        boolean isDead = false;
         health -= damage;
         
+        if (health <= 0) { 
+            isDead = true;
+        }
+        
+        return isDead;
     }
     
     /**
@@ -160,6 +185,14 @@ public class Enemy {
      */
     public Vector2 GetCurrentTile() {
         return currentTile;
+    }
+    
+    public float getTouchDetect(Enemy inputEnemy) {
+        return inputEnemy.touchDetectTimer;
+    }
+    
+    public void resetTouchDetect(Enemy inputEnemy) {
+        inputEnemy.touchDetectTimer = 0f;
     }
     
     
