@@ -43,13 +43,32 @@ public class Path {
         viewport.apply();
         float worldWidth = viewport.getWorldWidth();
         float worldHeight = viewport.getWorldHeight();
+        worldWidth = (worldWidth/8);
+        worldHeight = (worldHeight/8);
         
+       /*
         pathPoints.add(new Vector2(0f, (worldHeight/2)));
         pathPoints.add(new Vector2((worldWidth/3), (worldHeight/2)));
         pathPoints.add(new Vector2((worldWidth/3), (worldHeight/4)));
         pathPoints.add(new Vector2((2*worldWidth/3), (worldHeight/4)));
         pathPoints.add(new Vector2((2*worldWidth/3), (worldHeight/2)));
         pathPoints.add(new Vector2((4*worldWidth/5), (worldHeight/2)));
+        */
+        System.out.println("WorldWidth: " + worldWidth);
+        System.out.println("WorldHeight: " + worldHeight);
+        
+        pathPoints.add(new Vector2(0f, (worldHeight * 3.5f)));
+        pathPoints.add(new Vector2(worldWidth * 3.5f, worldHeight * 3.5f));
+        pathPoints.add(new Vector2(worldWidth * 3.5f, worldHeight * 5.5f));
+        pathPoints.add(new Vector2(worldWidth * 5.5f, worldHeight * 5.5f));
+        pathPoints.add(new Vector2(worldWidth * 5.5f, worldHeight * 1.5f));
+        pathPoints.add(new Vector2(worldWidth * 8.0f, worldHeight *1.5f));
+        
+        int i = 0;
+        for (Vector2 waypoint : pathPoints) {
+            System.out.println("Point " + i + ":    " + waypoint);
+            i++;
+        }
         
     }
     

@@ -28,7 +28,7 @@ public class PacketEnemy extends Enemy {
         
         //Starting location
         location.x = 0f;
-        location.y = (worldHeight/2);
+        location.y = (worldHeight * 3.5f/8);
         
         //Packet texturing and sprite
         enemyTexture = new Texture("packet.png");
