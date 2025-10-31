@@ -15,7 +15,7 @@ public class EnemyStutterer extends EnemyAbstract {
      * Also sets stutter cooldown.
      */
     public EnemyStutterer() {
-        super(2,10.6,1.03321);
+        super(2,10.6f,1.03321f);
         stutterCooldown = 2;
     }
     

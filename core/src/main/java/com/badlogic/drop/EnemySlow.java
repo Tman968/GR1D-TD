@@ -13,6 +13,6 @@ public class EnemySlow extends EnemyAbstract {
      * Constructs using the EnemyAbstract constructor with passed variables for ID, max hp, and speed respectively.
      */
     public EnemySlow() {
-        super(0,16.5,0.81013);
+        super(0,16.5f,0.81013f);
     }
 }

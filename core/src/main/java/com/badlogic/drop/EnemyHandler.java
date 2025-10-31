@@ -79,10 +79,13 @@ public class EnemyHandler {
     
     /**
      * Causes every enemy to act, and makes sure that they are all sorted.
+     * Returns the number of enemies that hit the F1R3W4LL.
+     * @return
      */
-    public void action() {
+    public int action() {
         int numEnemies;
         int newPathSegment;
+        int numFirewallHits = 0;
         EnemyCracked currEnemy;
         
         for (int currPathSegment = 0; currPathSegment <= NUM_PATH_SEGMENTS - 1; currPathSegment++) {
@@ -95,7 +98,10 @@ public class EnemyHandler {
                 } else {
                     currEnemy.act();
                     newPathSegment = (int)Math.floor(currEnemy.getProg()*NUM_PATH_SEGMENTS);
-                    if (currPathSegment != newPathSegment) {
+                    if (newPathSegment >= NUM_PATH_SEGMENTS) {
+                        path[currPathSegment].remove(currEnemyNum);
+                        numFirewallHits++;
+                    } else if (currPathSegment != newPathSegment) {
                         path[currPathSegment].remove(currEnemyNum);
                         path[newPathSegment].addFirst(currEnemy);
                         pathSortForwardEnemy(newPathSegment,0);
@@ -106,13 +112,13 @@ public class EnemyHandler {
             }
         }
         updateEnemyList();
+        return numFirewallHits;
     }
     
     /**
      * Returns the list of all enemies sorted by position along the path.
      * @return 
      */
-    
     public LinkedList<EnemyInterface> getPath() {
         final LinkedList<EnemyInterface> outList = new LinkedList();
         int numEnemies = enemyList.size();

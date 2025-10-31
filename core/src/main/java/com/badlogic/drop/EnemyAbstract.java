@@ -10,10 +10,10 @@ package com.badlogic.drop;
  */
 public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
     protected final int ID;
-    protected final double MAX_HP;
-    protected final double BASE_SPEED;
-    protected double prog;
-    protected double hp;
+    protected final float MAX_HP;
+    protected final float BASE_SPEED;
+    protected float prog;
+    protected float hp;
     protected boolean isDead;
     
     /**
@@ -23,7 +23,7 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
      * @param maxHP
      * @param baseSpeed 
      */
-    public EnemyAbstract(int id, double maxHP, double baseSpeed) {
+    public EnemyAbstract(int id, float maxHP, float baseSpeed) {
         ID = id;
         MAX_HP = maxHP;
         BASE_SPEED = baseSpeed;
@@ -46,7 +46,7 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
      * @param damage 
      */
     @Override
-    public void damage(double damage) {
+    public void damage(float damage) {
         hp -= damage;
         if (hp<=0) {
             isDead = true;
@@ -65,19 +65,19 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
      * @return 
      */
     @Override
-    public final double getMaxHP() {return MAX_HP;}
+    public final float getMaxHP() {return MAX_HP;}
     /**
      * Returns a percentage representing the distance along the whole path.
      * @return 
      */
     @Override
-    public final double getProg() {return prog;}
+    public final float getProg() {return prog;}
     /**
      * Returns the enemy's current health points.
      * @return 
      */
     @Override
-    public final double getHP() {return hp;}
+    public final float getHP() {return hp;}
     /**
      * Returns true if the enemy is dead.
      * @return 

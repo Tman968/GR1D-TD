@@ -14,7 +14,7 @@ public interface EnemyInterface {
      * If the enemy is reduced to 0 hit points or less, it is marked as dead.
      * @param damage 
      */
-    abstract public void damage(double damage);
+    abstract public void damage(float damage);
     
     /**
      * Returns the ID of the enemy.
@@ -26,17 +26,17 @@ public interface EnemyInterface {
      * Returns the maximum health points of the enemy.
      * @return 
      */
-    abstract public double getMaxHP();
+    abstract public float getMaxHP();
     /**
      * Returns a percentage representing the distance along the whole path.
      * @return 
      */
-    abstract public double getProg();
+    abstract public float getProg();
     /**
      * Returns the enemy's current health points.
      * @return 
      */
-    abstract public double getHP();
+    abstract public float getHP();
     /**
      * Returns true if the enemy is dead.
      * @return 
