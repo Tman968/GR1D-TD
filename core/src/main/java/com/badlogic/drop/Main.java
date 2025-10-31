@@ -59,8 +59,6 @@ public class Main implements ApplicationListener {
         touchPos = new Vector2();
         
         path = new Path();
-        path.createPath();
-        path.createWaypoints();
         
         packetArray = new Array<>();
         
@@ -116,7 +114,7 @@ public class Main implements ApplicationListener {
             {
                 for (int i = 0; i < path.waypointRectangleArray.size; i++) {
                     if (testPacketIn.enemyRectangle.overlaps(path.waypointRectangleArray.get(i)) & i < path.waypointRectangleArray.size-1 ) {
-                        testPacketIn.ChangeVelocity(testPacketIn, path.waypointRectangleArray.get(i) , path.waypointRectangleArray.get(i+1));
+                        testPacketIn.ChangeVelocity(path.waypointRectangleArray.get(i) , path.waypointRectangleArray.get(i+1));
                         testPacketIn.resetTouchDetect();
                     }
                 }

@@ -32,6 +32,9 @@ public class Path {
         waypointSpriteDefault = new Sprite(waypointTexture);
         waypointSpriteDefault.setSize(0.1f, 0.1f);
         viewport = new FitViewport(8,5);
+        
+        createPath();
+        createWaypoints();
     }
     
     /**
@@ -39,7 +42,7 @@ public class Path {
      * 
      * @author tdewe
      */
-    public void createPath() {
+    private void createPath() {
         viewport.apply();
         float worldWidth = viewport.getWorldWidth();
         float worldHeight = viewport.getWorldHeight();
@@ -77,7 +80,7 @@ public class Path {
      * 
      * @author tdewe
      */    
-    public void createWaypoints() {
+    private void createWaypoints() {
         //For loop to create the number of waypointSprites equal to the number of pathPoints
         float waypointWidth = 0.1f;
         float waypointHeight = 0.1f;
