@@ -126,6 +126,13 @@ public class Main implements ApplicationListener {
             testPacketIn.updateMovement();
         }
         
+        //Out of bounds Check
+        for (int i = 0; i < packetArray.size; i++) {
+            if (packetArray.get(i).checkOutOfBound()) {
+                packetArray.removeIndex(i);
+            }
+        }
+        
     }
     
     private void draw() {

@@ -62,4 +62,8 @@ public class PacketEnemy extends Enemy {
     public void resetTouchDetect() {
         super.resetTouchDetect(this);
     }
+    
+    public boolean checkOutOfBound() {
+        return super.checkOutOfBound(this);
+    }
 }

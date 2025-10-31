@@ -124,8 +124,8 @@ public class Enemy {
         System.out.println("Velocity x = " + velocity.x + "     Velocity y = " + velocity.y);
     }
     /**
-     * updateMovement sets the velocity (x,y) of the enemy
-     * @param inputEnemy 
+     * updateMovement sets the velocity (x,y) of the enemy along with incrementing percentage and touchDetectTimer
+     * @param inputEnemy used for subclass calling
      * @author tdewe
      */
     public void updateMovement(Enemy inputEnemy) {
@@ -193,6 +193,18 @@ public class Enemy {
     
     public void resetTouchDetect(Enemy inputEnemy) {
         inputEnemy.touchDetectTimer = 0f;
+    }
+    /**
+     * checkOutOfBound creates the ability to reference the location of an enemy compared to the worldWidth
+     * @param inputEnemy
+     * @return outOfBounds local flag variable 
+     */
+    public boolean checkOutOfBound(Enemy inputEnemy) {
+        boolean outOfBounds = false;
+        if (inputEnemy.enemySprite.getX() > inputEnemy.enemySprite.getWidth() + worldWidth) {
+            outOfBounds = true;
+        }
+        return outOfBounds;
     }
     
     
