@@ -4,12 +4,19 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 /** 
  * 
@@ -24,6 +31,17 @@ public class Main implements ApplicationListener {
     float addPacketTimer;
     boolean spriteOverlapWaypoint;
     
+    private Stage stage;
+    private Table table;
+    private Button shopButton;
+    private Skin shopButtonSkin;
+    private TextureAtlas atlas;
+    private AtlasRegion region;
+    private Sprite sprite;
+
+
+    
+    
     Array<PacketEnemy> packetArray;
     
     Texture backgroundTexture;
@@ -34,6 +52,8 @@ public class Main implements ApplicationListener {
     SpriteBatch spriteBatch;
     
     Path path;
+    
+    
     
     
     /**
@@ -49,6 +69,35 @@ public class Main implements ApplicationListener {
         // Prepare your application here.
         testPacket = new PacketEnemy();
         viewport = new FitViewport(8,5);
+        
+        
+        atlas = new TextureAtlas(Gdx.files.internal("Atlas/GR1D_atlas.atlas"));
+        
+        
+        
+        stage = new Stage(viewport);
+        Gdx.input.setInputProcessor(stage);
+        
+        table = new Table();
+        table.setFillParent(true);
+        stage.addActor(table);
+        
+        table.setDebug(true); // This is optional, but enables debug lines for tables.
+        
+        shopButtonSkin = new Skin(atlas);
+        
+        Button.ButtonStyle buttonStyle = new Button.ButtonStyle();
+        
+        buttonStyle.up = shopButtonSkin.getDrawable("shopButton");
+        
+        shopButtonSkin.add("default", buttonStyle);
+        
+        shopButton = new Button(shopButtonSkin);
+        
+        table.add(shopButton).expand().center().width(2).height(1);
+        
+        
+    
         spriteBatch = new SpriteBatch();
         timerVar = 0f;
         addPacketTimer = 0f;
@@ -69,7 +118,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
+        stage.getViewport().update(width, height, true);
         // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
         // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
         if(width <= 0 || height <= 0) return;
@@ -80,10 +129,18 @@ public class Main implements ApplicationListener {
     @Override
     public void render() {
         // Draw your application here.
+        
+        float delta = Gdx.graphics.getDeltaTime();
         input();
         logic();
+        stage.act(delta);
+        
+        
+        //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        
         draw();
         
+        stage.draw();
         
     }
     
@@ -96,8 +153,8 @@ public class Main implements ApplicationListener {
         {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY()); // get location of touch
             viewport.unproject(touchPos); //Convert units to world units
-            //testPacket.enemySprite.setCenterX(touchPos.x); //change the horizontally centered position of the bucket
-            //testPacket.enemySprite.setCenterY(touchPos.y);
+            testPacket.enemySprite.setCenterX(touchPos.x); //change the horizontally centered position of the bucket
+            testPacket.enemySprite.setCenterY(touchPos.y);
         }
     }
     
@@ -111,6 +168,7 @@ public class Main implements ApplicationListener {
             addPacketTimer = 0f;
         }
         
+        /*
         for (PacketEnemy testPacketIn : packetArray) {
             if (testPacketIn.getTouchDetect(testPacketIn) > 0.5f)
             {
@@ -125,6 +183,7 @@ public class Main implements ApplicationListener {
 
             testPacketIn.updateMovement();
         }
+        */
         
     }
     
@@ -174,5 +233,7 @@ public class Main implements ApplicationListener {
     @Override
     public void dispose() {
         // Destroy application's resources here.
+        
+        stage.dispose();
     }
 }
