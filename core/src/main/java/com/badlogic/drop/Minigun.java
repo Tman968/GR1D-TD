@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
 /**
- * Tower subclass
+ * minigun subclass
  * @author tdewe
  */
 public class Minigun extends Tower{
@@ -25,8 +25,19 @@ public class Minigun extends Tower{
          * @author tdewe
          */
     public Minigun() {
+        super();
         
-        minigunTexture = new Texture("minigun.png");
+        //mingun stats
+        damage = 10.0f;
+        range = 150;
+        cost = 100;
+        fireRate = 5;
+        
+        
+        minigunTexture = new Texture("towers/GR1D_Turret_1.png");
         minigunSprite = new Sprite(minigunTexture);
+        
+        defaultTowerSpriteTexture = minigunTexture;
+        defaultTowerSprite = minigunSprite;
     }
 }
