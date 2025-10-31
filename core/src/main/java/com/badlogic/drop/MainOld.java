@@ -1,6 +1,5 @@
 package com.badlogic.drop;
 
-import java.util.LinkedList;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -16,25 +15,25 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
  * 
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. 
  */
-public class Main implements ApplicationListener {
+public class MainOld implements ApplicationListener {
     
+    PacketEnemy testPacket;
     FitViewport viewport;
     //Movement update variable(s)
-    float spawnCDEnemySlow;
-    float spawnCDEnemyQuick;
-    float spawnCDEnemyStutterer;
+    float timerVar;
+    float addPacketTimer;
+    boolean spriteOverlapWaypoint;
     
-    EnemyHandler enemyHandler;
-    Path enemyCommander;
+    Array<PacketEnemy> packetArray;
     
     Texture backgroundTexture;
     
     Vector2 touchPos;
     
-    LinkedList<EnemyInterface> enemyList;
-    
     
     SpriteBatch spriteBatch;
+    
+    Path path;
     
     
     /**
@@ -48,18 +47,20 @@ public class Main implements ApplicationListener {
     @Override
     public void create() {
         // Prepare your application here.
+        testPacket = new PacketEnemy();
         viewport = new FitViewport(8,5);
         spriteBatch = new SpriteBatch();
-        spawnCDEnemySlow = 1f;
-        spawnCDEnemyQuick = 2f;
-        spawnCDEnemyStutterer = 5f;
-        
-        enemyHandler = new EnemyHandler();
-        enemyCommander = enemyHandler.getPathData();
+        timerVar = 0f;
+        addPacketTimer = 0f;
+        spriteOverlapWaypoint = false;
         
         backgroundTexture = new Texture("background.png");
         
         touchPos = new Vector2();
+        
+        path = new Path();
+        
+        packetArray = new Array<>();
         
         
     }
@@ -69,7 +70,7 @@ public class Main implements ApplicationListener {
         viewport.update(width, height, true);
         // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
         // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
-        if(width <= 0 || height <= 0);
+        if(width <= 0 || height <= 0) return;
 
         // Resize your application here. The parameters represent the new window size.
     }
@@ -100,24 +101,35 @@ public class Main implements ApplicationListener {
     
     private void logic() {
         float delta = Gdx.graphics.getDeltaTime();
-        spawnCDEnemySlow += delta;
-        spawnCDEnemyQuick += delta;
-        spawnCDEnemyStutterer += delta;
+        timerVar += delta;
+        addPacketTimer += delta;
         
-        if (spawnCDEnemySlow > 3.0f & enemyHandler.getNumEnemiesType(0) <= 3) {
-            enemyHandler.spawn(0);
-            spawnCDEnemySlow = 0f;
-        }
-        if (spawnCDEnemyQuick > 3.0f & enemyHandler.getNumEnemiesType(1) <= 3) {
-            enemyHandler.spawn(0);
-            spawnCDEnemyQuick = 0f;
-        }
-        if (spawnCDEnemyStutterer > 3.0f & enemyHandler.getNumEnemiesType(2) <= 3) {
-            enemyHandler.spawn(2);
-            spawnCDEnemyStutterer = 0f;
+        if (addPacketTimer > 3.0f & packetArray.size < 3) {
+            createPacket();
+            addPacketTimer = 0f;
         }
         
-        enemyHandler.action();
+        for (PacketEnemy testPacketIn : packetArray) {
+            if (testPacketIn.getTouchDetect(testPacketIn) > 0.5f)
+            {
+                for (int i = 0; i < path.waypointRectangleArray.size; i++) {
+                    if (testPacketIn.enemyRectangle.overlaps(path.waypointRectangleArray.get(i)) & i < path.waypointRectangleArray.size-1 ) {
+                        testPacketIn.ChangeVelocity(testPacketIn, path.waypointRectangleArray.get(i) , path.waypointRectangleArray.get(i+1));
+                        testPacketIn.resetTouchDetect();
+                    }
+                }
+            }
+
+
+            testPacketIn.updateMovement();
+        }
+        
+        //Out of bounds Check
+        for (int i = 0; i < packetArray.size; i++) {
+            if (packetArray.get(i).checkOutOfBound()) {
+                packetArray.removeIndex(i);
+            }
+        }
         
     }
     
@@ -135,18 +147,23 @@ public class Main implements ApplicationListener {
         spriteBatch.draw(backgroundTexture, 0,0, worldWidth, worldHeight);
         //testPacket.enemySprite.draw(spriteBatch);
         
-        
-        enemyList = enemyHandler.getEnemies();
-        
-        for (Sprite waypointSprite : enemyCommander.waypointSpriteArray) {
+        for (Sprite waypointSprite : path.waypointSpriteArray) {
             waypointSprite.draw(spriteBatch);
         }
         
-        for (EnemyInterface enemy : enemyList) {
-            enemy.getEnemySprite().draw(spriteBatch);
+        for (PacketEnemy packet : packetArray) {
+            packet.enemySprite.draw(spriteBatch);
         }
         
         spriteBatch.end();
+    }
+    /**
+     * createPacket spawns a packet enemy into the array of packet enemies
+     * @author tdewe
+     */
+    private void createPacket() {
+        PacketEnemy packet = new PacketEnemy();
+        packetArray.add(packet);
     }
 
     @Override
