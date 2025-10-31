@@ -96,7 +96,7 @@ public class Tower {
         for(Enemy enemy : enemies){
             if (enemy == null) continue;
             
-            float dist = Vector2.dst(location.x, location.y, enemy.getX(), enemy.getY());
+            float dist = Vector2.dst(location.x, location.y, enemy.enemySprite.getX(), enemy.enemySprite.getY());
             if (dist < range && dist < closestDist){
                 closestDist = dist;
                 target = enemy;
