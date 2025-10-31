@@ -81,9 +81,8 @@ public class Enemy {
      * changes velocity based on the location of two waypoints
      * @param waypointStart as starting waypoint
      * @param waypointEnd as ending waypoint
-     * @param inputEnemy the Enemy that velocity is being changed
      */
-    public void ChangeVelocity(Enemy inputEnemy, Rectangle waypointStart, Rectangle waypointEnd) {
+    public void ChangeVelocity(Rectangle waypointStart, Rectangle waypointEnd) {
         float speedVel = 0f;
         //Setting up vectors for changing the enemy velocity later
         Vector2 startLocation = new Vector2();
