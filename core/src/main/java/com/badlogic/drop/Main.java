@@ -100,25 +100,24 @@ public class Main implements ApplicationListener {
     
     private void logic() {
         float delta = Gdx.graphics.getDeltaTime();
-        spawnCDEnemySlow += delta;
-        spawnCDEnemyQuick += delta;
-        spawnCDEnemyStutterer += delta;
+        spawnCDEnemySlow -= delta;
+        spawnCDEnemyQuick -= delta;
+        spawnCDEnemyStutterer -= delta;
         
-        if (spawnCDEnemySlow > 3.0f & enemyHandler.getNumEnemiesType(0) <= 3) {
+        if (spawnCDEnemySlow <= 0f & enemyHandler.getNumEnemiesType(0) <= 3) {
             enemyHandler.spawn(0);
-            spawnCDEnemySlow = 0f;
+            spawnCDEnemySlow = 3f;
         }
-        if (spawnCDEnemyQuick > 3.0f & enemyHandler.getNumEnemiesType(1) <= 3) {
-            enemyHandler.spawn(0);
-            spawnCDEnemyQuick = 0f;
+        if (spawnCDEnemyQuick <= 0f & enemyHandler.getNumEnemiesType(1) <= 3) {
+            enemyHandler.spawn(1);
+            spawnCDEnemyQuick = 7f;
         }
-        if (spawnCDEnemyStutterer > 3.0f & enemyHandler.getNumEnemiesType(2) <= 3) {
+        if (spawnCDEnemyStutterer <= 0f & enemyHandler.getNumEnemiesType(2) <= 3) {
             enemyHandler.spawn(2);
-            spawnCDEnemyStutterer = 0f;
+            spawnCDEnemyStutterer = 10f;
         }
         
         enemyHandler.action();
-        
     }
     
     private void draw() {

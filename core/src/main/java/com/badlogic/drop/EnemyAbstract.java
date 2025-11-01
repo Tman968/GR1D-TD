@@ -65,11 +65,11 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
         // Setting up vectors
         location = new Vector2();
         velocity = new Vector2();
-        velocity.x = 1; //should be equal to BASE_SPEED
+        velocity.x = BASE_SPEED;
         velocity.y = 0f;
         location.x = 0f;
         location.y = (worldHeight * 3.5f/8);
-        progUpdate = 0.0001f; // ???; ask why this value is this
+        progUpdate = BASE_SPEED;
         
         //Setting textures and sprites
         enemyTexture = new Texture("packet.png");
@@ -92,9 +92,12 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
         else {
             enemyRectangle.set(enemySprite.getX() + enemySprite.getWidth()/2, enemySprite.getY()+enemySprite.getHeight()/2, enemySprite.getWidth()/2, enemySprite.getHeight()/2);
         }
-        prog += progUpdate;
+        prog += delta*progUpdate;
         touchDetectTimer += delta;
+        System.out.println("Distance travelled: " + prog);
+        //System.out.println("delta = "+delta+"      Pos(x,y) = ("+enemySprite.getX()+","+enemySprite.getY()+")      Velocity (x,y) = ("+velocity.x+","+velocity.y+")");
     }
+    
     
     
     
@@ -150,7 +153,7 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
             velocity.y = 0f;
         }
         
-        System.out.println("Velocity x = " + velocity.x + "     Velocity y = " + velocity.y);
+        //System.out.println("Velocity x = " + velocity.x + "     Velocity y = " + velocity.y);
     }
     
     @Override

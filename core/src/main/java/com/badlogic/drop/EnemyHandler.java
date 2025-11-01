@@ -16,7 +16,7 @@ import java.util.LinkedList;
  * @author natha
  */
 public class EnemyHandler {
-    public static final int NUM_PATH_SEGMENTS = 8;
+    public static final int NUM_PATH_SEGMENTS = 11;
     public static final int NUM_ENEMY_TYPES = 3;
     
     Path enemyCommander;
@@ -41,7 +41,7 @@ public class EnemyHandler {
         if (inEnemy.getTouchDetect() > 0.5) {
             for (int waypointNum = 0; waypointNum <= enemyCommander.waypointRectangleArray.size-2;waypointNum++) {
                 if (inEnemy.getHitbox().overlaps(enemyCommander.waypointRectangleArray.get(waypointNum))) {
-                    inEnemy.changeVelocity(enemyCommander.waypointRectangleArray.get(waypointNum), enemyCommander.waypointRectangleArray.get(waypointNum));
+                    inEnemy.changeVelocity(enemyCommander.waypointRectangleArray.get(waypointNum), enemyCommander.waypointRectangleArray.get(waypointNum+1));
                     inEnemy.resetTouchDetect();
                 }
             }
@@ -58,15 +58,15 @@ public class EnemyHandler {
      * @param enemyIndex 
      */
     private void pathSortForwardEnemy(int pathIndex, int enemyIndex) {
-        double enemyPos = path[pathIndex].get(enemyIndex).getProg();
+        double enemyProg = path[pathIndex].get(enemyIndex).getProg();
         int listSize = path[pathIndex].size();
-        if (enemyIndex + 1 > listSize-1) {
+        if (enemyIndex + 1 >= listSize) {
             return;
-        } else if (enemyPos <= path[pathIndex].get(enemyIndex).getProg()) {
+        } else if (enemyProg <= path[pathIndex].get(enemyIndex+1).getProg()) {
             return;
         }
         int newIndex = enemyIndex + 1;
-        while ((newIndex <= listSize-1) & (enemyPos > path[pathIndex].get(newIndex-1).getProg())) {
+        while ((newIndex <= listSize-2) && (path[pathIndex].get(enemyIndex).getProg() > path[pathIndex].get(newIndex+1).getProg())) {
             newIndex++;
         }
         
@@ -77,8 +77,8 @@ public class EnemyHandler {
     /**
      * Merges all path segments into enemyList.
      */
-    private void updateEnemyList() {
-        enemyList = path[0];
+    private void mergePaths() {
+        enemyList.clear();
         for (int currPathSegment = 0; currPathSegment <= NUM_PATH_SEGMENTS-1;currPathSegment++) {
             enemyList.addAll(path[currPathSegment]);
         }
@@ -103,6 +103,8 @@ public class EnemyHandler {
             default:
                 return;
         }
+        
+        System.out.println("Spawned " + enemyID);
         enemyList.addFirst(newEnemy);
         enemyTypeLists[enemyID].addFirst(newEnemy);
         path[0].addFirst(newEnemy);
@@ -129,12 +131,14 @@ public class EnemyHandler {
                 } else {
                     acceptCommand(currEnemy);
                     currEnemy.act();
-                    newPathSegment = (int)Math.floor(currEnemy.getProg()*NUM_PATH_SEGMENTS);
+                    newPathSegment = (int)Math.floor(currEnemy.getProg());
                     if (newPathSegment >= NUM_PATH_SEGMENTS) {
                         path[currPathSegment].remove(currEnemyNum);
+                        enemyTypeLists[currEnemy.getID()].remove(currEnemy);
                         numFirewallHits++;
                     } else if (currPathSegment != newPathSegment) {
                         path[currPathSegment].remove(currEnemyNum);
+                        enemyTypeLists[currEnemy.getID()].remove(currEnemy);
                         path[newPathSegment].addFirst(currEnemy);
                         pathSortForwardEnemy(newPathSegment,0);
                     } else {
@@ -143,7 +147,7 @@ public class EnemyHandler {
                 }
             }
         }
-        updateEnemyList();
+        mergePaths();
         return numFirewallHits;
     }
     
@@ -172,7 +176,7 @@ public class EnemyHandler {
         outList = new LinkedList();
         if ((id >= 0) && (id <= NUM_ENEMY_TYPES-1)) {
             for (EnemyInterface enemy : enemyTypeLists[id]) {
-            outList.add(enemy);
+                outList.add(enemy);
             }
         }
         return outList;

@@ -4,19 +4,21 @@
  */
 package com.badlogic.drop;
 
+import com.badlogic.gdx.Gdx;
+
 /**
  *
  * @author natha
  */
 public class EnemyStutterer extends EnemyAbstract {
-    private int stutterCooldown; 
+    private int stutterCooldown;
     /**
      * Constructs using the EnemyAbstract constructor with passed variables for ID, max hp, and speed respectively.
      * Also sets stutter cooldown.
      */
     public EnemyStutterer() {
         super(2,10.6f,1.03321f);
-        stutterCooldown = 2;
+        stutterCooldown = 10;
     }
     
     /**
@@ -25,11 +27,14 @@ public class EnemyStutterer extends EnemyAbstract {
      */
     @Override
     public void act() {
+        float delta = Gdx.graphics.getDeltaTime();
         if (stutterCooldown <= 0) {
-            stutterCooldown = 2;
+            stutterCooldown = 100;
+        } else if (stutterCooldown <= 30) {
+            stutterCooldown -= delta;
         } else {
             updateMovement();
-            stutterCooldown--;
+            stutterCooldown -= delta;
         }
     }
 }
