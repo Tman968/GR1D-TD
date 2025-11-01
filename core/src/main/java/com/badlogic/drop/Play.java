@@ -9,13 +9,14 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import static com.badlogic.gdx.scenes.scene2d.ui.Table.Debug.cell;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -26,6 +27,28 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
  */
 public class Play implements Screen {
 
+    //Tanner added current
+    PacketEnemy testPacket;
+    //FitViewport viewport;
+    //Movement update variable(s)
+    float timerVar;
+    float addPacketTimer;
+    boolean spriteOverlapWaypoint;
+    
+    Array<PacketEnemy> packetArray;
+    
+    Texture backgroundTexture;
+    
+    Vector2 touchPos;
+    
+    
+    SpriteBatch spriteBatch;
+    
+    Path path;
+    
+    float timerPrint;
+    
+    //End Tanner added
     
     FitViewport viewport;
     
@@ -43,6 +66,18 @@ public class Play implements Screen {
     private int tileHeight;
     
     public Play() {
+        //Tanner added
+        spriteBatch = new SpriteBatch();
+        timerVar = 0f;
+        timerPrint = 0f;
+        addPacketTimer = 0f;
+        spriteOverlapWaypoint = false;
+        
+        backgroundTexture = new Texture("background.png");
+        
+        touchPos = new Vector2();
+        
+        packetArray = new Array<>();
     }
     
 
@@ -76,6 +111,9 @@ public class Play implements Screen {
         // Create fitviewport with map dimensions and camera
         viewport = new FitViewport(mapWidth, mapHeight, camera);
         
+        //Tanner added
+        path = new Path(viewport);
+        
         // Center camera on map
         camera.position.set(mapWidth /2, mapHeight /2 , 0);
         camera.update();
@@ -94,6 +132,7 @@ public class Play implements Screen {
 
     @Override
     public void render(float delta) {
+        
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         
@@ -112,7 +151,13 @@ public class Play implements Screen {
         for (Tower tower : towers){
             tower.render(renderer.getBatch());
         }
+        
+        //Tanner added
+        input();
+        logic();
+        draw();
         renderer.getBatch().end();
+        
     }
     
     private void handleTowerPlacement(){
@@ -217,6 +262,80 @@ public class Play implements Screen {
     public void dispose() {
         map.dispose();
         renderer.dispose();
+    }
+    
+    
+    
+    //Tanner added main methods
+    private void logic() {
+        float delta = Gdx.graphics.getDeltaTime();
+        timerVar += delta;
+        addPacketTimer += delta;
+        timerPrint += delta;
+        
+        // Max number of packets on the screen is 3 (can be changed by setting < 3 to < x)
+        if (addPacketTimer > 3.0f & packetArray.size < 3) {
+            createPacket();
+            addPacketTimer = 0f;
+        }
+        
+        for (PacketEnemy testPacketIn : packetArray) {
+            if (testPacketIn.getTouchDetect(testPacketIn) > 2.0f)
+            {
+                for (int i = 0; i < path.waypointRectangleArray.size; i++) {
+                    if (testPacketIn.enemyRectangle.overlaps(path.waypointRectangleArray.get(i)) & i < path.waypointRectangleArray.size-1 ) {
+                        testPacketIn.ChangeVelocity(path.waypointRectangleArray.get(i) , path.waypointRectangleArray.get(i+1));
+                        testPacketIn.resetTouchDetect();
+                    }
+                }
+            }
+
+
+            testPacketIn.updateMovement();
+        }
+        
+        //Out of bounds Check
+        for (int i = 0; i < packetArray.size; i++) {
+            if (packetArray.get(i).checkOutOfBound()) {
+                packetArray.removeIndex(i);
+            }
+        }
+    }
+    
+    /**
+     * createPacket spawns a packet enemy into the array of packet enemies
+     * @author tdewe
+     */
+    private void createPacket() {
+        PacketEnemy packet = new PacketEnemy(viewport);
+        packetArray.add(packet);
+    }
+    
+    private void input() {
+        
+    }
+    
+    private void draw() {
+        viewport.apply();
+        
+        spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
+        spriteBatch.begin();
+        
+        //Draws the waypoints onto the screen for testing / debugging
+        /*for (Sprite waypointSprite : path.waypointSpriteArray) {
+            waypointSprite.draw(spriteBatch);
+        }*/
+        
+        for (PacketEnemy packet : packetArray) {
+            packet.enemySprite.draw(spriteBatch);
+        }
+        if (packetArray.size > 0 & timerPrint > 1.0f) {
+           System.out.println("Enemy 0: loc x- " + packetArray.get(0).enemySprite.getX() 
+                   + "  loc y- " + packetArray.get(0).enemySprite.getY());
+           timerPrint = 0f;
+        }
+        
+        spriteBatch.end();
     }
     
 }

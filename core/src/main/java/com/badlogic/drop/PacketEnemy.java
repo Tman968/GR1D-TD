@@ -14,15 +14,15 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
  */
 public class PacketEnemy extends Enemy {
     
-    FitViewport viewport;
     
     /**
          * PacketEnemy() is the constructor for the packet class
          * @author tdewe
+         * @param gameViewport takes the viewport of the class packetEnemy is created in
          */
-    public PacketEnemy() {
+    public PacketEnemy(FitViewport gameViewport) {
         //Setting up viewport
-        viewport = new FitViewport(8,5);
+        viewport = gameViewport;
         worldWidth = viewport.getWorldWidth();
         worldHeight = viewport.getWorldHeight();
         
@@ -33,14 +33,14 @@ public class PacketEnemy extends Enemy {
         //Packet texturing and sprite
         enemyTexture = new Texture("packet.png");
         enemySprite = new Sprite(enemyTexture);
-        enemySprite.setSize(0.5f, 0.5f);
+        enemySprite.setSize(48f, 48f);
         enemySprite.setX((location.x)-enemySprite.getWidth()/2);
         enemySprite.setY((location.y)-enemySprite.getHeight()/2);
         
         // Variables for default packet stats placeholders for now
         health = 100;
         speed = 0;
-        velocity.x = 1f;
+        velocity.x = 40f; //Constant speed of packet
         velocity.y = 0f;
         percentageUpdate = 0.01f;
         //Max velocity may not be used in the program, as a constant speed may be used

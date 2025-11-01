@@ -24,16 +24,16 @@ public class Path {
     Array<Rectangle> waypointRectangleArray;
     
     
-    public Path() {
+    public Path(FitViewport gameViewport) {
         pathPoints = new Array<>();
         waypointSpriteArray = new Array<>();
         waypointRectangleArray = new Array<>();
         waypointTexture = new Texture("dotWaypoint.png");
         waypointSpriteDefault = new Sprite(waypointTexture);
-        waypointSpriteDefault.setSize(0.1f, 0.1f);
+        waypointSpriteDefault.setSize(20f, 20f);
         viewport = new FitViewport(8,5);
         
-        createPath();
+        createPath(gameViewport);
         createWaypoints();
     }
     
@@ -42,7 +42,8 @@ public class Path {
      * 
      * @author tdewe
      */
-    private void createPath() {
+    private void createPath(FitViewport gameViewport) {
+        viewport = gameViewport;
         viewport.apply();
         float worldWidth = viewport.getWorldWidth();
         float worldHeight = viewport.getWorldHeight();
@@ -82,8 +83,8 @@ public class Path {
      */    
     private void createWaypoints() {
         //For loop to create the number of waypointSprites equal to the number of pathPoints
-        float waypointWidth = 0.1f;
-        float waypointHeight = 0.1f;
+        float waypointWidth = 20f;
+        float waypointHeight = 20f;
         float waypointSpriteWidth = waypointSpriteDefault.getWidth();
         float waypointSpriteHeight = waypointSpriteDefault.getHeight();
         
