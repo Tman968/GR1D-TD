@@ -36,10 +36,15 @@ public class Enemy {
     
     //Default Textures and Sprites
     Texture enemyTexture;
+    Texture enemyDamageTexture;
     Sprite enemySprite;
     
     //Enemy Hitbox
     Rectangle enemyRectangle;
+    
+    // Animation Variables
+    float animTime;
+    boolean isInAnim;
     
     /**
          * Constructor for the tower superclass, setting default values.
@@ -61,6 +66,7 @@ public class Enemy {
         
         //Setting textures and sprites
         enemyTexture = new Texture("packet.png");
+        enemyDamageTexture = new Texture("packetDamage.png");
         enemySprite = new Sprite(enemyTexture);
         enemySprite.setSize(1, 1);
         enemySprite.setX(location.x);
@@ -74,6 +80,8 @@ public class Enemy {
         percentage = 0f;
         percentageUpdate = 0f;
         touchDetectTimer = 0f;
+        animTime = 0f;
+        isInAnim = false;
         
     }
     
@@ -148,7 +156,7 @@ public class Enemy {
      * @param damage as int damage taken
      * @return isDead
      */
-    public boolean takeDamage(int damage) {
+    public boolean takeDamage(float damage) {
         boolean isDead = false;
         health -= damage;
         
@@ -205,6 +213,27 @@ public class Enemy {
         }
         return outOfBounds;
     }
+    
+    // Activate Damage Animation
+    public void activateDamageAnimation() {
+        enemySprite.setTexture(enemyDamageTexture);
+        isInAnim = true;
+        
+    }
+    
+    // Update Damage Animation
+    public void updateDamageAnimation() {
+        if (animTime > 0.2f) {
+            enemySprite.setTexture(enemyTexture);
+            isInAnim = false;
+            animTime = 0;
+        }
+        else {
+            animTime += Gdx.graphics.getDeltaTime();
+        }
+        
+    }
+    
     
     
 }

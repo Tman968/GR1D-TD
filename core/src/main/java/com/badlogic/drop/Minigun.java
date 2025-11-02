@@ -17,6 +17,7 @@ public class Minigun extends Tower{
      * @author tdewe
      */
     Texture minigunTexture;
+    Texture minigunTextureShooting;
     Sprite minigunSprite;
     
     
@@ -35,9 +36,11 @@ public class Minigun extends Tower{
         
         
         minigunTexture = new Texture("towers/GR1D_Turret_1.png");
+        minigunTextureShooting = new Texture("towers/GR1D_Turret_Shooting_1.png");
         minigunSprite = new Sprite(minigunTexture);
         
         defaultTowerSpriteTexture = minigunTexture;
+        defaultTowerSpriteTextureShooting = minigunTextureShooting;
         defaultTowerSprite = minigunSprite;
     }
 }

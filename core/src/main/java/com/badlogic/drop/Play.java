@@ -48,6 +48,8 @@ public class Play implements Screen {
     
     float timerPrint;
     
+    float attackTimer;
+    
     //End Tanner added
     
     FitViewport viewport;
@@ -71,6 +73,7 @@ public class Play implements Screen {
         timerVar = 0f;
         timerPrint = 0f;
         addPacketTimer = 0f;
+        attackTimer = 0f;
         spriteOverlapWaypoint = false;
         
         backgroundTexture = new Texture("background.png");
@@ -272,6 +275,7 @@ public class Play implements Screen {
         timerVar += delta;
         addPacketTimer += delta;
         timerPrint += delta;
+        attackTimer += delta;
         
         // Max number of packets on the screen is 3 (can be changed by setting < 3 to < x)
         if (addPacketTimer > 3.0f & packetArray.size < 3) {
@@ -293,6 +297,51 @@ public class Play implements Screen {
 
             testPacketIn.updateMovement();
         }
+        
+        
+        
+        // Enemy Takes Damage
+        if (packetArray.size > 0 && attackTimer > 1.0f) {
+            for (Tower tower : towers) {
+                if (packetArray.size > 0 && packetArray.get(0).takeDamage(tower.damage)) {
+                    packetArray.removeIndex(0);
+                }
+                else if (packetArray.size > 0 && !packetArray.get(0).isInAnim) {
+                    packetArray.get(0).activateDamageAnimation();
+                }
+                
+                if (!tower.isInAnim) {
+                    tower.activateShootAnimation();
+                }
+                
+                
+                
+            }
+            attackTimer = 0f;
+        }
+        
+        // Tower shooting animation is updated
+        if (towers.size > 0) {
+            for (Tower tower : towers)
+            {
+                if (tower.isInAnim)
+                {
+                    tower.updateShootAnimation();
+                }
+            }
+        }
+        
+        // Tower damage animation is updated
+        if (packetArray.size > 0) {
+            for (Enemy enemy : packetArray)
+            {
+                if (enemy.isInAnim)
+                {
+                    enemy.updateDamageAnimation();
+                }
+            }
+        }
+        
         
         //Out of bounds Check
         for (int i = 0; i < packetArray.size; i++) {

@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.badlogic.drop;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -28,11 +29,16 @@ public class Tower {
     
     //Texture variables
     Texture defaultTowerSpriteTexture;
+    Texture defaultTowerSpriteTextureShooting;
     Texture defaultBulletTexture;
+    
     
     //Default Sprites
     Sprite defaultTowerSprite;
     Sprite defaultBulletSprite;
+    
+    float animTime;
+    boolean isInAnim;
     
    
     
@@ -56,6 +62,8 @@ public class Tower {
         cost = 0;
         fireRate = 0;
         location = new Vector2();
+        animTime = 0f;
+        isInAnim = false;
     }
 
     
@@ -113,6 +121,25 @@ public class Tower {
     
     
     
+    // Activate Shooting Animation
+    public void activateShootAnimation() {
+        defaultTowerSprite.setTexture(defaultTowerSpriteTextureShooting);
+        isInAnim = true;
+        
+    }
     
+    // Update Shooting Animation
+    public void updateShootAnimation() {
+        if (animTime > 0.2f) {
+            defaultTowerSprite.setTexture(defaultTowerSpriteTexture);
+            isInAnim = false;
+            animTime = 0;
+        }
+        else {
+            animTime += Gdx.graphics.getDeltaTime();
+        }
+        
+    }
     
+
 }
