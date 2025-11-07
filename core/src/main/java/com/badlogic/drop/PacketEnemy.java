@@ -46,6 +46,8 @@ public class PacketEnemy extends Enemy {
         //Max velocity may not be used in the program, as a constant speed may be used
         // (no acceleration)
         maxVelocity = 3f; //Constant that will be determined through testing
+        deathMoney = 25; // How much money the packet gives you
+        damage = 5; // how much damage the enemy does when it gets to you
     }
     
     /**
