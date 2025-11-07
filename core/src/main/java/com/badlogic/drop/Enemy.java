@@ -22,6 +22,8 @@ public class Enemy {
     Vector2 velocity;
     float maxVelocity;
     float touchDetectTimer;
+    int deathMoney;
+    int damage;
     
     Vector2 location;
     Vector2 currentTile;
@@ -76,12 +78,14 @@ public class Enemy {
         //Setting default values for variables
         health = 0;
         speed = 0;
+        damage = 0;
         maxVelocity = 0;
         percentage = 0f;
         percentageUpdate = 0f;
         touchDetectTimer = 0f;
         animTime = 0f;
         isInAnim = false;
+        deathMoney = 0;
         
     }
     
