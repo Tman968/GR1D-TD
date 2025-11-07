@@ -19,6 +19,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 
 /**
@@ -62,10 +63,14 @@ public class Play implements Screen {
     private Array<Tower> towers = new Array<>();
     private Texture towerTexture;
     
-    
-    //Map properties
+    // Map properties
     private int tileWidth;
     private int tileHeight;
+    
+    // Health and Money
+    BitmapFont font;
+    int health;
+    int money;
     
     public Play() {
         //Tanner added
@@ -81,6 +86,12 @@ public class Play implements Screen {
         touchPos = new Vector2();
         
         packetArray = new Array<>();
+        
+        // Health and Money
+        font = new BitmapFont();
+        font.getData().setScale(2.0f); // Scales the font to twice its original size
+        health = 100;
+        money = 300;
     }
     
 
@@ -112,7 +123,7 @@ public class Play implements Screen {
         float mapHeight = mapHeightinTiles * tileHeight;
         
         // Create fitviewport with map dimensions and camera
-        viewport = new FitViewport(mapWidth, mapHeight, camera);
+        viewport = new FitViewport(mapWidth + 200, mapHeight, camera);
         
         //Tanner added
         path = new Path(viewport);
@@ -161,6 +172,8 @@ public class Play implements Screen {
         draw();
         renderer.getBatch().end();
         
+        
+        
     }
     
     private void handleTowerPlacement(){
@@ -191,6 +204,7 @@ public class Play implements Screen {
             tower.setPosition(tileX * tileWidth, tileY * tileHeight, tileWidth);
             towers.add(tower);
             System.out.println("Tower placed at the tile: " + tileX + ", " + tileY);
+            money-=tower.getCost();
         } else {
             System.out.println("ERR0R. CANNOT BUILD!");
         }
@@ -304,6 +318,7 @@ public class Play implements Screen {
         if (packetArray.size > 0 && attackTimer > 1.0f) {
             for (Tower tower : towers) {
                 if (packetArray.size > 0 && packetArray.get(0).takeDamage(tower.damage)) {
+                    money+=packetArray.get(0).deathMoney;
                     packetArray.removeIndex(0);
                 }
                 else if (packetArray.size > 0 && !packetArray.get(0).isInAnim) {
@@ -346,6 +361,7 @@ public class Play implements Screen {
         //Out of bounds Check
         for (int i = 0; i < packetArray.size; i++) {
             if (packetArray.get(i).checkOutOfBound()) {
+                health-=packetArray.get(i).damage;
                 packetArray.removeIndex(i);
             }
         }
@@ -383,6 +399,12 @@ public class Play implements Screen {
                    + "  loc y- " + packetArray.get(0).enemySprite.getY());
            timerPrint = 0f;
         }
+        
+        // Health and Money
+        
+        
+        font.draw(spriteBatch, "Health: " + health, 525, 450);
+        font.draw(spriteBatch, "Money: " + money, 525, 420);
         
         spriteBatch.end();
     }
