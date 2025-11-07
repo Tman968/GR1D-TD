@@ -23,8 +23,10 @@ public class Path {
     Array<Sprite> waypointSpriteArray;
     Array<Rectangle> waypointRectangleArray;
     
+    float tileSize;
     
-    public Path(FitViewport gameViewport) {
+    
+    public Path(FitViewport gameViewport, float tileWidth) {
         pathPoints = new Array<>();
         waypointSpriteArray = new Array<>();
         waypointRectangleArray = new Array<>();
@@ -32,6 +34,7 @@ public class Path {
         waypointSpriteDefault = new Sprite(waypointTexture);
         waypointSpriteDefault.setSize(20f, 20f);
         viewport = new FitViewport(8,5);
+        tileSize = tileWidth;
         
         createPath(gameViewport);
         createWaypoints();
@@ -54,13 +57,21 @@ public class Path {
         System.out.println("WorldWidth: " + worldWidth);
         System.out.println("WorldHeight: " + worldHeight);
         
+        pathPoints.add(new Vector2(0f, (tileSize * 3.5f)));
+        pathPoints.add(new Vector2(tileSize * 3.5f, tileSize * 3.5f));
+        pathPoints.add(new Vector2(tileSize * 3.5f, tileSize * 5.5f));
+        pathPoints.add(new Vector2(tileSize * 5.5f, worldHeight * 5.5f));
+        pathPoints.add(new Vector2(tileSize * 5.5f, tileSize * 1.5f));
+        pathPoints.add(new Vector2(tileSize * 8.0f, tileSize *1.5f));
+        
+        /*
         pathPoints.add(new Vector2(0f, (worldHeight * 3.5f)));
         pathPoints.add(new Vector2(worldWidth * 3.5f, worldHeight * 3.5f));
         pathPoints.add(new Vector2(worldWidth * 3.5f, worldHeight * 5.5f));
         pathPoints.add(new Vector2(worldWidth * 5.5f, worldHeight * 5.5f));
         pathPoints.add(new Vector2(worldWidth * 5.5f, worldHeight * 1.5f));
         pathPoints.add(new Vector2(worldWidth * 8.0f, worldHeight *1.5f));
-        
+        */
         int i = 0;
         for (Vector2 waypoint : pathPoints) {
             System.out.println("Point " + i + ":    " + waypoint);

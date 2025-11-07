@@ -66,6 +66,12 @@ public class Play implements Screen {
     
     //End Tanner added
     
+    private float shopStartX;
+    private int shopWidth;
+    private float mapWidth;
+    private float mapHeight;
+    float totalWidth;
+    
     FitViewport viewport;
     
     private TiledMap map;
@@ -119,7 +125,8 @@ public class Play implements Screen {
         
    
         
-       
+       // Shop width in pixels variable
+        shopWidth = 350;
         
        
         
@@ -140,11 +147,14 @@ public class Play implements Screen {
         pauseButton.setX(mapWidth - tileWidth * 3f/4);
         pauseButton.setY(mapHeight - tileHeight * 3f/4);
         
+        // Allocate space for the shop
+        totalWidth = mapWidth + shopWidth;
+        shopStartX = mapWidth;
         // Create fitviewport with map dimensions and camera
-        viewport = new FitViewport(mapWidth, mapHeight, camera);
+        viewport = new FitViewport(totalWidth, mapHeight, camera);
         
         //Tanner added
-        path = new Path(viewport);
+        path = new Path(viewport, tileWidth);
         
         // Center camera on map
         camera.position.set(mapWidth /2, mapHeight /2 , 0);
