@@ -9,16 +9,22 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+
 
 
 /**
@@ -27,9 +33,17 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
  */
 public class Play implements Screen {
 
+    //pause button WIP info
+    private Stage stage;
+    ImageButton.ImageButtonStyle style;
+    ImageButton pauseButton;
+    //GameState enumerated type controls the current gamestate
+    enum GameState {
+        INGAME, PAUSED
+    }
+    GameState gameState;
     //Tanner added current
     PacketEnemy testPacket;
-    //FitViewport viewport;
     //Movement update variable(s)
     float timerVar;
     float addPacketTimer;
@@ -68,6 +82,17 @@ public class Play implements Screen {
     private int tileHeight;
     
     public Play() {
+        //Pause button properties
+        style = new ImageButton.ImageButtonStyle();
+        // pauseButton Texture
+        style.up = new TextureRegionDrawable(new TextureRegion(new Texture("pauseButton.png")));
+        // playButton(resume) Texture
+        style.down = new TextureRegionDrawable(new TextureRegion(new Texture("playButton.png")));
+        pauseButton = new ImageButton(style);
+        pauseButton.setSize(40,40);
+        
+        gameState = GameState.INGAME;
+        
         //Tanner added
         spriteBatch = new SpriteBatch();
         timerVar = 0f;
@@ -111,6 +136,10 @@ public class Play implements Screen {
         float mapWidth = mapWidthinTiles * tileWidth;
         float mapHeight = mapHeightinTiles * tileHeight;
         
+        // Setting pause button spot
+        pauseButton.setX(mapWidth - tileWidth * 3f/4);
+        pauseButton.setY(mapHeight - tileHeight * 3f/4);
+        
         // Create fitviewport with map dimensions and camera
         viewport = new FitViewport(mapWidth, mapHeight, camera);
         
@@ -131,35 +160,63 @@ public class Play implements Screen {
         System.out.println("Welcome to the GR1D. Place your defenses.");
         System.out.println("Tile size: " + tileWidth + "x" + tileHeight);
         
+        //Pause button (and other buttons later) stage creation
+        stage = new Stage(viewport, spriteBatch);
+        Gdx.input.setInputProcessor(stage);
+        stage.addActor(pauseButton);
+        // pauseButton click listener
+        pauseButton.addListener(new ClickListener() {
+           @Override
+           public void clicked(InputEvent event, float x, float y) {
+               if (gameState == GameState.INGAME) {
+                   gameState = GameState.PAUSED;
+               } else if (gameState == GameState.PAUSED) {
+                   gameState = GameState.INGAME;
+               }
+           }
+            
+        });
+        
     }
 
     @Override
     public void render(float delta) {
-        
-        Gdx.gl.glClearColor(0,0,0,1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        
-        viewport.apply();
-        camera.update();
-        
-        renderer.setView(camera);
-        renderer.render();
-        
-        if (Gdx.input.justTouched()){
-            handleTowerPlacement();
+        // Rendering stuff while in game
+        if (gameState == GameState.INGAME) {
+            Gdx.gl.glClearColor(0,0,0,1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+            viewport.apply();
+            camera.update();
+
+            renderer.setView(camera);
+            renderer.render();
+
+            if (Gdx.input.justTouched()){
+                handleTowerPlacement();
+            }
+
+            // Render towers
+            renderer.getBatch().begin();
+            for (Tower tower : towers){
+                tower.render(renderer.getBatch());
+            }
+
+            //Tanner added
+            stage.act(delta);
+            input();
+            logic();
+            draw();
+            stage.draw();
+            renderer.getBatch().end();
+        } else if (gameState == GameState.PAUSED) {
+            // Does stuff for paused gameState
+        } else {
+            //Should never reach here
+            System.out.println("Something broke, in invalid gameState. Terminating");
+            Gdx.app.exit();
         }
         
-        // Render towers
-        renderer.getBatch().begin();
-        for (Tower tower : towers){
-            tower.render(renderer.getBatch());
-        }
-        
-        //Tanner added
-        input();
-        logic();
-        draw();
-        renderer.getBatch().end();
         
     }
     

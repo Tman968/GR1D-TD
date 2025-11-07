@@ -49,15 +49,8 @@ public class Path {
         float worldHeight = viewport.getWorldHeight();
         worldWidth = (worldWidth/8);
         worldHeight = (worldHeight/8);
+       
         
-       /*
-        pathPoints.add(new Vector2(0f, (worldHeight/2)));
-        pathPoints.add(new Vector2((worldWidth/3), (worldHeight/2)));
-        pathPoints.add(new Vector2((worldWidth/3), (worldHeight/4)));
-        pathPoints.add(new Vector2((2*worldWidth/3), (worldHeight/4)));
-        pathPoints.add(new Vector2((2*worldWidth/3), (worldHeight/2)));
-        pathPoints.add(new Vector2((4*worldWidth/5), (worldHeight/2)));
-        */
         System.out.println("WorldWidth: " + worldWidth);
         System.out.println("WorldHeight: " + worldHeight);
         
