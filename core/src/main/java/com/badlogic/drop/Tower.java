@@ -95,7 +95,7 @@ public class Tower {
     }
  
     // Update tower logic like attacking
-    
+    /*
     public void update(float delta, Array<Enemy> enemies){
         //Find closest enemy in range
         Enemy target = null;
@@ -111,6 +111,7 @@ public class Tower {
             }
         }
     }
+    */
     
     // Getters
     public int getTileX() {return tileX;}

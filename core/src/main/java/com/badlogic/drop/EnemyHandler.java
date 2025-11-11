@@ -19,8 +19,6 @@ public class EnemyHandler {
     public final int NUM_PATH_SEGMENTS = 14;
     public static final int NUM_ENEMY_TYPES = 3;
     
-    PathNew enemyCommander;
-    
     private LinkedList<EnemyCracked> enemyList = new LinkedList();
     private LinkedList<EnemyCracked>[] path = new LinkedList[NUM_PATH_SEGMENTS];
     private LinkedList<EnemyCracked>[] enemyTypeLists = new LinkedList[NUM_ENEMY_TYPES];
@@ -29,7 +27,6 @@ public class EnemyHandler {
     
     public EnemyHandler(FitViewport gameViewport) {
         viewport = gameViewport;
-        enemyCommander = new PathNew(viewport);
         
         for (int i = 0; i<=NUM_PATH_SEGMENTS-1;i++) {
             path[i] = new LinkedList();
@@ -40,16 +37,6 @@ public class EnemyHandler {
         }
     }
     
-    private void acceptCommand(EnemyCracked inEnemy) {
-        if (inEnemy.getTouchDetect() > 0.5) {
-            for (int waypointNum = 0; waypointNum <= enemyCommander.waypointRectangleArray.size-2;waypointNum++) {
-                if (inEnemy.getHitbox().overlaps(enemyCommander.waypointRectangleArray.get(waypointNum))) {
-                    inEnemy.changeVelocity(enemyCommander.waypointRectangleArray.get(waypointNum), enemyCommander.waypointRectangleArray.get(waypointNum+1));
-                    inEnemy.resetTouchDetect();
-                }
-            }
-        }
-    }
     
     
     /**
@@ -89,7 +76,6 @@ public class EnemyHandler {
     
     public void setViewport(FitViewport newViewport) {
         viewport = newViewport;
-        enemyCommander.setViewport(newViewport);
     }
     
     /**
@@ -137,7 +123,6 @@ public class EnemyHandler {
                     path[currPathSegment].remove(currEnemyNum);
                     enemyTypeLists[currEnemy.getID()].remove(currEnemy);
                 } else {
-                    //acceptCommand(currEnemy);
                     currEnemy.act();
                     newPathSegment = (int)Math.floor(currEnemy.getProg());
                     if (newPathSegment >= NUM_PATH_SEGMENTS) {
@@ -158,8 +143,6 @@ public class EnemyHandler {
         mergePaths();
         return numFirewallHits;
     }
-    
-    public PathNew getPathData() {return enemyCommander;}
     
     /**
      * Returns the enemy furthest along the path;

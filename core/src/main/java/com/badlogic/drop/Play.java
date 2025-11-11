@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import java.util.LinkedList;
 
 
 
@@ -43,22 +44,25 @@ public class Play implements Screen {
     }
     GameState gameState;
     //Tanner added current
-    PacketEnemy testPacket;
     //Movement update variable(s)
     float timerVar;
-    float addPacketTimer;
     boolean spriteOverlapWaypoint;
     
-    Array<PacketEnemy> packetArray;
+    EnemyHandler enemyHandler;
+    
+    float spawnCDEnemySlow;
+    float spawnCDEnemyQuick;
+    float spawnCDEnemyStutterer;
     
     Texture backgroundTexture;
     
     Vector2 touchPos;
     
+    LinkedList<EnemyInterface> enemyList;
+    
     
     SpriteBatch spriteBatch;
     
-    Path path;
     
     float timerPrint;
     
@@ -103,7 +107,9 @@ public class Play implements Screen {
         spriteBatch = new SpriteBatch();
         timerVar = 0f;
         timerPrint = 0f;
-        addPacketTimer = 0f;
+        spawnCDEnemySlow = 1f;
+        spawnCDEnemyQuick = 2f;
+        spawnCDEnemyStutterer = 5f;
         attackTimer = 0f;
         spriteOverlapWaypoint = false;
         
@@ -113,7 +119,13 @@ public class Play implements Screen {
         
         touchPos = new Vector2();
         
-        packetArray = new Array<>();
+        EnemyCommander enemyCommand = new EnemyCommander();
+        float prog = -1;
+        while (prog <= 15) {
+            System.out.println(prog + "-" + (prog+0.5f) % 1f + ": (" + enemyCommand.progToPos(prog).x + "," + enemyCommand.progToPos(prog).y + ")");
+            prog += 0.052313f;
+        }
+        
     }
     
 
@@ -156,7 +168,7 @@ public class Play implements Screen {
         viewport = new FitViewport(totalWidth, mapHeight, camera);
         
         //Tanner added
-        path = new Path(viewport, tileWidth);
+        enemyHandler = new EnemyHandler(viewport);
         
         // Center camera on map
         camera.position.set(mapWidth /2, mapHeight /2 , 0);
@@ -342,42 +354,33 @@ public class Play implements Screen {
     private void logic() {
         float delta = Gdx.graphics.getDeltaTime();
         timerVar += delta;
-        addPacketTimer += delta;
         timerPrint += delta;
         attackTimer += delta;
+        spawnCDEnemySlow -= delta;
+        spawnCDEnemyQuick -= delta;
+        spawnCDEnemyStutterer -= delta;
         
-        // Max number of packets on the screen is 3 (can be changed by setting < 3 to < x)
-        if (addPacketTimer > 3.0f & packetArray.size < 3) {
-            createPacket();
-            addPacketTimer = 0f;
+        if (spawnCDEnemySlow <= 0f & enemyHandler.getNumEnemiesType(0) < 4) {
+            enemyHandler.spawn(0);
+            spawnCDEnemySlow = 3f;
+        }
+        if (spawnCDEnemyQuick <= 0f & enemyHandler.getNumEnemiesType(1) < 4) {
+            enemyHandler.spawn(1);
+            spawnCDEnemyQuick = 7f;
+        }
+        if (spawnCDEnemyStutterer <= 0f & enemyHandler.getNumEnemiesType(2) < 4) {
+            enemyHandler.spawn(2);
+            spawnCDEnemyStutterer = 10f;
         }
         
-        for (PacketEnemy testPacketIn : packetArray) {
-            if (testPacketIn.getTouchDetect(testPacketIn) > 2.0f)
-            {
-                for (int i = 0; i < path.waypointRectangleArray.size; i++) {
-                    if (testPacketIn.enemyRectangle.overlaps(path.waypointRectangleArray.get(i)) & i < path.waypointRectangleArray.size-1 ) {
-                        testPacketIn.ChangeVelocity(path.waypointRectangleArray.get(i) , path.waypointRectangleArray.get(i+1));
-                        testPacketIn.resetTouchDetect();
-                    }
-                }
-            }
-
-
-            testPacketIn.updateMovement();
-        }
+        enemyHandler.action();
         
         
         
         // Enemy Takes Damage
-        if (packetArray.size > 0 && attackTimer > 1.0f) {
+        if (enemyHandler.getNumEnemies() > 0 && attackTimer > 1.0f) {
             for (Tower tower : towers) {
-                if (packetArray.size > 0 && packetArray.get(0).takeDamage(tower.damage)) {
-                    packetArray.removeIndex(0);
-                }
-                else if (packetArray.size > 0 && !packetArray.get(0).isInAnim) {
-                    packetArray.get(0).activateDamageAnimation();
-                }
+                enemyHandler.getLatestEnemy().damage(tower.damage);
                 
                 if (!tower.isInAnim) {
                     tower.activateShootAnimation();
@@ -400,33 +403,6 @@ public class Play implements Screen {
             }
         }
         
-        // Tower damage animation is updated
-        if (packetArray.size > 0) {
-            for (Enemy enemy : packetArray)
-            {
-                if (enemy.isInAnim)
-                {
-                    enemy.updateDamageAnimation();
-                }
-            }
-        }
-        
-        
-        //Out of bounds Check
-        for (int i = 0; i < packetArray.size; i++) {
-            if (packetArray.get(i).checkOutOfBound()) {
-                packetArray.removeIndex(i);
-            }
-        }
-    }
-    
-    /**
-     * createPacket spawns a packet enemy into the array of packet enemies
-     * @author tdewe
-     */
-    private void createPacket() {
-        PacketEnemy packet = new PacketEnemy(viewport);
-        packetArray.add(packet);
     }
     
     private void input() {
@@ -444,12 +420,14 @@ public class Play implements Screen {
             waypointSprite.draw(spriteBatch);
         }*/
         
-        for (PacketEnemy packet : packetArray) {
-            packet.enemySprite.draw(spriteBatch);
+        enemyList = enemyHandler.getEnemies();
+        
+        for (EnemyInterface enemy : enemyList) {
+            enemy.getEnemySprite().draw(spriteBatch);
         }
-        if (packetArray.size > 0 & timerPrint > 1.0f) {
-           System.out.println("Enemy 0: loc x- " + packetArray.get(0).enemySprite.getX() 
-                   + "  loc y- " + packetArray.get(0).enemySprite.getY());
+        if (enemyHandler.getNumEnemies() > 0 & timerPrint > 1.0f) {
+           System.out.println("Enemy 0: loc x- " + enemyList.getLast().getEnemySprite().getX() 
+                   + "  loc y- " + enemyList.getLast().getEnemySprite().getY());
            timerPrint = 0f;
         }
         
