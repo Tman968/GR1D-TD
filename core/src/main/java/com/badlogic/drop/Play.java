@@ -109,6 +109,8 @@ public class Play implements Screen {
         
         backgroundTexture = new Texture("background.png");
         
+        
+        
         touchPos = new Vector2();
         
         packetArray = new Array<>();
