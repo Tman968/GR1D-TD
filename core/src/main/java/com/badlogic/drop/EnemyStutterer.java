@@ -5,6 +5,7 @@
 package com.badlogic.drop;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
  *
@@ -15,9 +16,10 @@ public class EnemyStutterer extends EnemyAbstract {
     /**
      * Constructs using the EnemyAbstract constructor with passed variables for ID, max hp, and speed respectively.
      * Also sets stutter cooldown.
+     * @param gameViewport
      */
-    public EnemyStutterer() {
-        super(2,10.6f,1.03321f);
+    public EnemyStutterer(FitViewport gameViewport) {
+        super(gameViewport,2,10.6f,1.03321f);
         stutterCooldown = 10;
     }
     
@@ -36,5 +38,6 @@ public class EnemyStutterer extends EnemyAbstract {
             updateMovement();
             stutterCooldown -= delta;
         }
+        updateDamageAnimation();
     }
 }

@@ -4,6 +4,8 @@
  */
 package com.badlogic.drop;
 
+import com.badlogic.gdx.utils.viewport.FitViewport;
+
 /**
  * A quick enemy type.
  * Extends EnemyAbstract.
@@ -13,8 +15,9 @@ public class EnemyQuick extends EnemyAbstract {
     
     /**
      * Constructs using the EnemyAbstract constructor with passed variables for ID, max hp, and speed respectively.
+     * @param gameViewport
      */
-    public EnemyQuick() {
-        super(1,7.3f,1.362768f); // initializes using the EnemyAbstract contructor
+    public EnemyQuick(FitViewport gameViewport) {
+        super(gameViewport, 1,7.3f,1.362768f); // initializes using the EnemyAbstract contructor
     }
 }

@@ -18,6 +18,8 @@ public interface EnemyInterface {
      */
     abstract public void damage(float damage);
     
+    
+    
     /**
      * Returns the ID of the enemy.
      * Each enemy type is assigned an ID.
@@ -48,6 +50,8 @@ public interface EnemyInterface {
     abstract public Rectangle getHitbox();
     
     abstract public Sprite getEnemySprite();
+    
+    abstract public boolean getIsInAnim();
     
     abstract public float getTouchDetect();
 }

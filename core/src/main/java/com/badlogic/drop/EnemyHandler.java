@@ -16,18 +16,20 @@ import java.util.LinkedList;
  * @author natha
  */
 public class EnemyHandler {
-    public static final int NUM_PATH_SEGMENTS;
+    public final int NUM_PATH_SEGMENTS = 14;
     public static final int NUM_ENEMY_TYPES = 3;
     
-    Path enemyCommander;
+    PathNew enemyCommander;
     
     private LinkedList<EnemyCracked> enemyList = new LinkedList();
     private LinkedList<EnemyCracked>[] path = new LinkedList[NUM_PATH_SEGMENTS];
     private LinkedList<EnemyCracked>[] enemyTypeLists = new LinkedList[NUM_ENEMY_TYPES];
     
-    public EnemyHandler(int numPathSegments) {
-        NUM_PATH_SEGMENTS = numPathSegments;
-        enemyCommander = new Path();
+    FitViewport viewport;
+    
+    public EnemyHandler(FitViewport gameViewport) {
+        viewport = gameViewport;
+        enemyCommander = new PathNew(viewport);
         
         for (int i = 0; i<=NUM_PATH_SEGMENTS-1;i++) {
             path[i] = new LinkedList();
@@ -85,6 +87,11 @@ public class EnemyHandler {
         }
     }
     
+    public void setViewport(FitViewport newViewport) {
+        viewport = newViewport;
+        enemyCommander.setViewport(newViewport);
+    }
+    
     /**
      * Spawns an enemy, with enemy type indicated by the given ID.
      * @param enemyID 
@@ -93,13 +100,13 @@ public class EnemyHandler {
         EnemyCracked newEnemy;
         switch (enemyID) {
             case 0:
-                newEnemy = new EnemySlow();
+                newEnemy = new EnemySlow(viewport);
                 break;
             case 1:
-                newEnemy = new EnemyQuick();
+                newEnemy = new EnemyQuick(viewport);
                 break;
             case 2:
-                newEnemy = new EnemyStutterer();
+                newEnemy = new EnemyStutterer(viewport);
                 break;
             default:
                 return;
@@ -130,7 +137,7 @@ public class EnemyHandler {
                     path[currPathSegment].remove(currEnemyNum);
                     enemyTypeLists[currEnemy.getID()].remove(currEnemy);
                 } else {
-                    acceptCommand(currEnemy);
+                    //acceptCommand(currEnemy);
                     currEnemy.act();
                     newPathSegment = (int)Math.floor(currEnemy.getProg());
                     if (newPathSegment >= NUM_PATH_SEGMENTS) {
@@ -152,7 +159,15 @@ public class EnemyHandler {
         return numFirewallHits;
     }
     
-    public Path getPathData() {return enemyCommander;}
+    public PathNew getPathData() {return enemyCommander;}
+    
+    /**
+     * Returns the enemy furthest along the path;
+     * @return 
+     */
+    public EnemyInterface getLatestEnemy() {
+        return enemyList.getLast();
+    }
     
     /**
      * Returns the list of all enemies sorted by position along the path.

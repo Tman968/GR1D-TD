@@ -4,6 +4,8 @@
  */
 package com.badlogic.drop;
 
+import com.badlogic.gdx.utils.viewport.FitViewport;
+
 /**
  *
  * @author natha
@@ -11,8 +13,9 @@ package com.badlogic.drop;
 public class EnemySlow extends EnemyAbstract {
     /**
      * Constructs using the EnemyAbstract constructor with passed variables for ID, max hp, and speed respectively.
+     * @param gameViewport
      */
-    public EnemySlow() {
-        super(0,16.5f,0.61013f);
+    public EnemySlow(FitViewport gameViewport) {
+        super(gameViewport,0,16.5f,0.61013f);
     }
 }

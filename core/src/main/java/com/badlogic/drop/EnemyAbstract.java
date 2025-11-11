@@ -26,6 +26,7 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
     
     protected Vector2 velocity;
     protected float maxVelocity;
+    protected float scale;
     protected float touchDetectTimer;
     
     protected Vector2 location;
@@ -35,9 +36,15 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
     protected final float worldWidth;
     protected final float worldHeight;
     
+    float animTime;
+    boolean isInAnim;
+    
     //Default Textures and Sprites
     protected Texture enemyTexture;
+    protected Texture enemyDamageTexture;
     protected final Sprite enemySprite;
+    
+    EnemyCommander enemyCommander;
     
     //Enemy Hitbox
     protected Rectangle enemyRectangle;
@@ -45,11 +52,13 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
     /**
      * Constructor for EnemyAbstract.
      * Defines the constants ID, MAX_HP, and BASE_SPEED with its inputs, and places the enemy at the start of the track.
+     * @param gameViewport
      * @param id
      * @param maxHP
      * @param baseSpeed 
      */
-    public EnemyAbstract(int id, float maxHP, float baseSpeed) {
+    public EnemyAbstract(FitViewport gameViewport, int id, float maxHP, float baseSpeed) {
+        viewport = gameViewport;
         ID = id;
         MAX_HP = maxHP;
         BASE_SPEED = baseSpeed;
@@ -58,7 +67,6 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
         isDead = false;
         
         //Setting viewport variables
-        viewport = new FitViewport(8,5);
         worldWidth = viewport.getWorldWidth();
         worldHeight = viewport.getWorldHeight();
         
@@ -67,34 +75,35 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
         velocity = new Vector2();
         velocity.x = BASE_SPEED;
         velocity.y = 0f;
+        scale = worldHeight/8;
         location.x = 0f;
         location.y = (worldHeight * 3.5f/8);
         progUpdate = BASE_SPEED;
         
         //Setting textures and sprites
         enemyTexture = new Texture("packet.png");
+        enemyDamageTexture = new Texture("packetDamage.png");
         enemySprite = new Sprite(enemyTexture);
-        enemySprite.setSize(0.5f, 0.5f);
+        enemySprite.setSize(48f, 48f);
         enemySprite.setX((location.x)-enemySprite.getWidth()/2);
         enemySprite.setY((location.y)-enemySprite.getHeight()/2);
         enemyRectangle = new Rectangle();
+        
+        enemyCommander = new EnemyCommander();
+        
+        //Setting animation vars
+        animTime = 0f;
+        isInAnim = false;
     }
     
     protected void updateMovement() {
         float delta = Gdx.graphics.getDeltaTime();
-        enemySprite.translateX(delta * velocity.x);
-        enemySprite.translateY(delta * velocity.y);
-        // keeps the enemy hitbox (Rectangle) centered along the path
-        if (velocity.y >= 0)
-        {
-            enemyRectangle.set(enemySprite.getX(), enemySprite.getY(), enemySprite.getWidth()/2, enemySprite.getHeight()/2);
-        }
-        else {
-            enemyRectangle.set(enemySprite.getX() + enemySprite.getWidth()/2, enemySprite.getY()+enemySprite.getHeight()/2, enemySprite.getWidth()/2, enemySprite.getHeight()/2);
-        }
         prog += delta*progUpdate;
+        enemySprite.setCenterX(scale * enemyCommander.progToPos(prog).x);
+        enemySprite.setCenterY(scale * enemyCommander.progToPos(prog).y);
+        // keeps the enemy hitbox (Rectangle) centered along the path
         touchDetectTimer += delta;
-        System.out.println("Distance travelled: " + prog);
+        //System.out.println("Distance travelled: " + prog);
         //System.out.println("delta = "+delta+"      Pos(x,y) = ("+enemySprite.getX()+","+enemySprite.getY()+")      Velocity (x,y) = ("+velocity.x+","+velocity.y+")");
     }
     
@@ -107,7 +116,7 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
      * If an enemy uses this method for act(), it simply progress by it's base speed.
      */
     @Override
-    public void act() {updateMovement();};
+    public void act() {updateMovement();updateDamageAnimation();};
     
     /**
      * 
@@ -171,6 +180,26 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
         if (hp<=0) {
             isDead = true;
         }
+        activateDamageAnimation();
+    }
+    
+    // Activate Damage Animation
+    protected void activateDamageAnimation() {
+        enemySprite.setTexture(enemyDamageTexture);
+        isInAnim = true;
+        
+    }
+    
+    // Update Damage Animation
+    protected void updateDamageAnimation() {
+        if (animTime > 0.2f) {
+            enemySprite.setTexture(enemyTexture);
+            isInAnim = false;
+            animTime = 0;
+        }
+        else {
+            animTime += Gdx.graphics.getDeltaTime();
+        }
     }
     
     /**
@@ -214,6 +243,9 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
     
     @Override
     public final Rectangle getHitbox() {return enemyRectangle;}
+    
+    @Override
+    public final boolean getIsInAnim() {return isInAnim;}
     
     @Override
     public final float getTouchDetect() {return touchDetectTimer;}
