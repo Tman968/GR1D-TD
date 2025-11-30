@@ -16,6 +16,6 @@ public class EnemySlow extends EnemyAbstract {
      * @param gameViewport
      */
     public EnemySlow(FitViewport gameViewport) {
-        super(gameViewport,0,16.5f,0.61013f);
+        super(gameViewport,0,30f,0.61013f);
     }
 }
