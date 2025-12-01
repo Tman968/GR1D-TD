@@ -1,3 +1,4 @@
+# Note: Use this Readme for testing the other program, other README files (if any) may be ignored 
 # GR1D-TD Simple Startup Guide
 # 1. Go to the .jar file in location (add location) and start the program
 # 2. If that does not work, launch the program from Netbeans
