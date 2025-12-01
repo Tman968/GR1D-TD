@@ -32,7 +32,7 @@ public class Minigun extends Tower{
         damage = 10.0f;
         range = 150;
         cost = 100;
-        fireRate = 5;
+        fireRate = 0.2f;
         
         
         minigunTexture = new Texture("towers/GR1D_Turret_1.png");

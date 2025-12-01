@@ -242,7 +242,6 @@ public class Play implements Screen {
 
             //Tanner added
             stage.act(delta);
-            input();
             logic();
             draw();
             
@@ -466,47 +465,38 @@ public class Play implements Screen {
         
         // Enemy Takes Damage
         if (enemyHandler.getNumEnemies() > 0 && attackTimer > 1.0f) {
-            LinkedList<EnemyInterface> currentEnemies = enemyHandler.getEnemies();
         
-        for (Tower tower : towers) {
-            for (EnemyInterface enemy : currentEnemies) {
-                
-                // Check if enemy was alive before damage
-                
-                boolean wasAlive = !enemy.getIsDead();
-                
-                enemy.damage(tower.damage);
-                
-                // Check if this damage killed the enemy
-                
-                if (wasAlive && enemy.getIsDead()) {
-                    shop.addCurrency(5);
-                    
+            for (Tower tower : towers) {
+ 
+                if (!tower.isInAnim) {
+                    tower.activateShootAnimation();
                 }
+                
             }
+            attackTimer = 0f;
             
-            if (!tower.isInAnim) {
-                tower.activateShootAnimation();
-            }
         }
-        attackTimer = 0f;
-    }
-        
-        // Tower shooting animation is updated
+        // Tower shooting animation is updated and shooting towers 
         if (towers.size > 0) {
             for (Tower tower : towers)
             {
                 if (tower.isInAnim)
                 {
-                    tower.updateShootAnimation();
+                    if (tower.updateShootAnimation()) {
+                        enemyHandler.getLatestEnemy().damage(tower.damage);
+                    }
                 }
             }
         }
-        
-    }
-    
-    private void input() {
-        
+        if (enemyHandler.getNumEnemies() > 0) {
+            LinkedList<EnemyInterface> currentEnemies = enemyHandler.getEnemies();
+            for (EnemyInterface enemy: currentEnemies) {
+                    if (enemy.getIsDead())
+                    {
+                        shop.addCurrency(5);
+                    }
+            }
+        }  
     }
     
     private void draw() {

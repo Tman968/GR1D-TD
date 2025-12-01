@@ -81,7 +81,7 @@ public class Shop {
         
         // Initialize textures
         minigunIcon = new Texture("towers/GR1D_Turret_1.png");
-        sniperIcon = new Texture("shopButton.png");
+        sniperIcon = new Texture("towers/Sniper.png");
         empIcon = new Texture("shopButton.png");
         
         // Initialize buttons
