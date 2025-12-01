@@ -3,6 +3,12 @@ buildscript {
   repositories {
     gradlePluginPortal()
   }
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
   dependencies {
     classpath "io.github.fourlastor:construo:1.7.1"
     if(enableGraalNative == 'true') {

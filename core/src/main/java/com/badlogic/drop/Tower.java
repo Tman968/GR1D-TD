@@ -60,7 +60,7 @@ public class Tower {
         damage = 0.0f;
         range = 0;
         cost = 100;
-        fireRate = 0;
+        fireRate = 10.0f;
         location = new Vector2();
         animTime = 0f;
         isInAnim = false;
@@ -129,18 +129,24 @@ public class Tower {
         
     }
     
-    // Update Shooting Animation
-    public void updateShootAnimation() {
-        if (animTime > 0.2f) {
+    /**
+     * updateShootAnimation both updates the shooting sprite of the tower and lets Play() know the tower can deal damage
+     * @return shootCheck 
+     * @author tdewe
+     * @author Paul
+     */
+    public boolean updateShootAnimation() {
+        boolean shootCheck = false;
+        if (animTime > fireRate) {
             defaultTowerSprite.setTexture(defaultTowerSpriteTexture);
+            shootCheck = true;
             isInAnim = false;
             animTime = 0;
         }
         else {
             animTime += Gdx.graphics.getDeltaTime();
         }
-        
+        return shootCheck;
     }
-    
 
 }

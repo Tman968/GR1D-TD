@@ -54,7 +54,6 @@ public class Shop {
     // Type of tower 
     private static final int minigunTower = 1;
     private static final int sniperTower = 2;
-    private static final int empTower = 3;
     
     // font for the labels
     private BitmapFont font;
@@ -81,15 +80,13 @@ public class Shop {
         
         // Initialize textures
         minigunIcon = new Texture("towers/GR1D_Turret_1.png");
-        sniperIcon = new Texture("shopButton.png");
-        empIcon = new Texture("shopButton.png");
+        sniperIcon = new Texture("towers/Sniper.png");
         
         // Initialize buttons
         float startY = shopY + shopHeight - buttonHeight - buttonPadding;
         
         minigunButton = new Rectangle(shopX + buttonPadding, startY, buttonWidth, buttonHeight);
         sniperButton = new Rectangle(shopX + buttonPadding, startY - buttonHeight - buttonPadding, buttonWidth,buttonHeight);
-        empButton = new Rectangle(shopX + buttonPadding,   startY - (buttonHeight + buttonPadding) * 2, buttonWidth, buttonHeight);
         
         // Initialize font
         font = new BitmapFont();
@@ -126,10 +123,6 @@ public class Shop {
             selectedTower = sniperTower;
             System.out.println("Sniper Selected");
             return true;
-        } else if (empButton.contains(worldX, worldY)){
-            selectedTower = empTower;
-            System.out.println("EMP Selected");
-            return true;
         }
         
         
@@ -163,8 +156,6 @@ public class Shop {
                 return 100;
             case sniperTower:
                 return 150;
-            case empTower:
-                return 200;
             default:
                 return 0;
         }
@@ -192,25 +183,19 @@ public class Shop {
         
         batch.draw(sniperIcon, sniperButton.x, sniperButton.y, sniperButton.width, sniperButton.height);
         
-        batch.draw(empIcon, empButton.x, empButton.y, empButton.width, empButton.height);
-        
         // Draw labels and costs
-        font.draw(batch, "Minigun", minigunButton.x + buttonWidth + 10, minigunButton.y + buttonHeight/2);
-        font.draw(batch, "$100", minigunButton.x + buttonWidth + 10, minigunButton.y + buttonHeight/2 - 20);
+        font.draw(batch, "Minigun", minigunButton.x + buttonWidth + 10, minigunButton.y + buttonHeight/2 + 15);
+        font.draw(batch, "$100", minigunButton.x + buttonWidth + 10, minigunButton.y + buttonHeight/2 - 20 + 15);
         
-        font.draw(batch, "Sniper", sniperButton.x + buttonWidth + 10, sniperButton.y + buttonHeight/2);
-        font.draw(batch, "$150", sniperButton.x + buttonWidth + 10, sniperButton.y + buttonHeight/2 - 20);
-        
-        font.draw(batch, "EMP", empButton.x + buttonWidth + 10, empButton.y + buttonHeight/2);
-        font.draw(batch, "$200", empButton.x + buttonWidth + 10, empButton.y + buttonHeight/2 - 20);
-        
-        
+        font.draw(batch, "Sniper", sniperButton.x + buttonWidth + 10, sniperButton.y + buttonHeight/2 + 15);
+        font.draw(batch, "$150", sniperButton.x + buttonWidth + 10, sniperButton.y + buttonHeight/2 - 20+ 15);
+  
         //Draws player currency
         font.draw(batch, "Credits: " + playerCurrency ,minigunButton.x, minigunButton.height + buttonHeight/2 - 100  );
         
         if (firewallHealth >= 0) {
             String healthText = "F1R3W4LL: " + (int)firewallHealth + "/" + (int)firewallMaxHealth;
-            font.draw(batch, healthText, minigunButton.x, minigunButton.height + buttonHeight/2 - 50 );
+            font.draw(batch, healthText, minigunButton.x, minigunButton.height + buttonHeight/2 - 80 );
                 
         }
         
@@ -253,8 +238,6 @@ public class Shop {
                 return minigunButton;
             case sniperTower:
                 return sniperButton;
-            case empTower:
-                return empButton;
             default:
                 return null;
         }
