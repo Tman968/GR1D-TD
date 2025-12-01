@@ -453,29 +453,29 @@ public class Play implements Screen {
         if (enemyHandler.getNumEnemies() > 0 && attackTimer > 1.0f) {
             LinkedList<EnemyInterface> currentEnemies = enemyHandler.getEnemies();
         
-        for (Tower tower : towers) {
-            for (EnemyInterface enemy : currentEnemies) {
+            for (Tower tower : towers) {
+                for (EnemyInterface enemy : currentEnemies) {
                 
-                // Check if enemy was alive before damage
+                    // Check if enemy was alive before damage
                 
-                boolean wasAlive = !enemy.getIsDead();
+                    boolean wasAlive = !enemy.getIsDead();
                 
-                enemy.damage(tower.damage);
+                    enemy.damage(tower.damage);
                 
-                // Check if this damage killed the enemy
+                    // Check if this damage killed the enemy
                 
-                if (wasAlive && enemy.getIsDead()) {
-                    shop.addCurrency(5);
+                    if (wasAlive && enemy.getIsDead()) {
+                        shop.addCurrency(5);
                     
+                    }
+                }
+            
+                if (!tower.isInAnim) {
+                    tower.activateShootAnimation();
                 }
             }
-            
-            if (!tower.isInAnim) {
-                tower.activateShootAnimation();
-            }
+            attackTimer = 0f;
         }
-        attackTimer = 0f;
-    }
         
         // Tower shooting animation is updated
         if (towers.size > 0) {

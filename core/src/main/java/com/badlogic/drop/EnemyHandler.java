@@ -30,9 +30,9 @@ public class EnemyHandler {
     // the rate of enemy spawns at the end of the game; must be above 0, and should be above I_ENEMY_SPAWN_RATE
     public static final float F_ENEMY_SPAWN_RATE = 3f;
     // how much time passes until the final phase of the game starts; must be greater than 1
-    public static final float END_GAME_START = 100f;
+    public static final float END_GAME_START = 270f;
     // how much time passes until the game ends; must be greater than END_GAME_START
-    public static final float END_GAME_END = 120f;
+    public static final float END_GAME_END = 300f;
     
     private LinkedList<EnemyCracked> enemyList = new LinkedList();
     private LinkedList<EnemyCracked>[] path = new LinkedList[NUM_PATH_SEGMENTS];
