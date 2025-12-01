@@ -56,7 +56,7 @@ public class Play implements Screen {
     float spawnCDEnemyStutterer;
     
     Texture backgroundTexture;
-    
+    Texture BSODTexture;
     Vector2 touchPos;
     
     LinkedList<EnemyInterface> enemyList;
@@ -122,7 +122,8 @@ public class Play implements Screen {
         spriteOverlapWaypoint = false;
         
         backgroundTexture = new Texture("background.png");
-        
+        BSODTexture = new Texture("BSOD.png");
+                
         // Initializes firewall with 100HP
         firewall = new Firewall(100);
         
@@ -242,15 +243,14 @@ public class Play implements Screen {
 
             //Tanner added
             stage.act(delta);
-            input();
             logic();
             draw();
             
-            
-            
-            
-            
             stage.draw();
+            if(firewall.isDestroyed()) {
+                renderer.getBatch().draw(BSODTexture, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+        }
+          
             renderer.getBatch().end();
         } else if (gameState == GameState.PAUSED) {
             // Does stuff for paused gameState
@@ -260,6 +260,7 @@ public class Play implements Screen {
             Gdx.app.exit();
         }
         
+            
         
     }
     
@@ -342,7 +343,7 @@ public class Play implements Screen {
 
     private boolean isBuildable(int tileX, int tileY){
         // Get the buildable layer from the map
-        TiledMapTileLayer buildableLayer = (TiledMapTileLayer) map.getLayers().get(0);
+        TiledMapTileLayer buildableLayer = (TiledMapTileLayer) map.getLayers().get(1);
         
      
         
@@ -419,7 +420,6 @@ public class Play implements Screen {
         timerVar += delta;
         timerPrint += delta;
         attackTimer += delta;
-        
      
         
         
@@ -431,7 +431,7 @@ public class Play implements Screen {
         
         // Apply damage to firewall for each enemy that reached the end
         if (numFirewallHits > 0) {
-            int damagePerEnemy = 2; // Each enemy deals 2 HP damage
+            int damagePerEnemy = 10; // Each enemy deals 10 HP damage
             firewall.takeDamage(numFirewallHits * damagePerEnemy);
             System.out.println("F1R3W4LL TAKES " + (int)(numFirewallHits * damagePerEnemy) + " DAMAGE! ");
         }
@@ -439,58 +439,48 @@ public class Play implements Screen {
         // Check if game is over
         if (firewall.isDestroyed()) {
             //System.out.println("F1R3W4LL BREACHED! GAME OVER.");
+            
             System.out.println("==============================");
             System.out.println("      MAINFRAME BREACHED!     ");
             System.out.println("          GAME OVER.          ");
             System.out.println("==============================");
-            System.exit(0);
         }
         
-        
-        
-        
         // Enemy Takes Damage
-        if (enemyHandler.getNumEnemies() > 0 && attackTimer > 1.0f) {
-            LinkedList<EnemyInterface> currentEnemies = enemyHandler.getEnemies();
+        if (enemyHandler.getNumEnemies() > 0 && attackTimer > 0.3f) {
         
             for (Tower tower : towers) {
-                for (EnemyInterface enemy : currentEnemies) {
-                
-                    // Check if enemy was alive before damage
-                
-                    boolean wasAlive = !enemy.getIsDead();
-                
-                    enemy.damage(tower.damage);
-                
-                    // Check if this damage killed the enemy
-                
-                    if (wasAlive && enemy.getIsDead()) {
-                        shop.addCurrency(5);
-                    
-                    }
-                }
-            
+ 
                 if (!tower.isInAnim) {
                     tower.activateShootAnimation();
                 }
+                
             }
             attackTimer = 0f;
+            
         }
-        
-        // Tower shooting animation is updated
+        // Tower shooting animation is updated and shooting towers 
         if (towers.size > 0) {
             for (Tower tower : towers)
             {
                 if (tower.isInAnim)
                 {
-                    tower.updateShootAnimation();
+                    if (tower.updateShootAnimation() && enemyHandler.getNumEnemies() > 0) {
+                        enemyHandler.getLatestEnemy().damage(tower.damage);
+                    }
                 }
             }
         }
+        if (enemyHandler.getNumEnemies() > 0) {
+            LinkedList<EnemyInterface> currentEnemies = enemyHandler.getEnemies();
+            for (EnemyInterface enemy: currentEnemies) {
+                    if (enemy.getIsDead())
+                    {
+                        shop.addCurrency(5);
+                    }
+            }
+        }
         
-    }
-    
-    private void input() {
         
     }
     
@@ -522,4 +512,3 @@ public class Play implements Screen {
     }
     
 }
-

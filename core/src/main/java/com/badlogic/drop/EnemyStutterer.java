@@ -20,7 +20,7 @@ public class EnemyStutterer extends EnemyAbstract {
      */
     public EnemyStutterer(FitViewport gameViewport) {
         super(gameViewport,2,50f,1.03321f);
-        stutterCooldown = 10;
+        stutterCooldown = 100;
     }
     
     /**

@@ -16,8 +16,7 @@ public class SniperTower extends Tower {
      * SniperTower class is a tower subclass that creates and manages Sniper units
      * @author xaplinzz
      */
-    Texture packetTexture;
-    Sprite packetSprite;
+    
     
     
     /**
@@ -25,10 +24,17 @@ public class SniperTower extends Tower {
          * @author xaplinzz
          */
     public SniperTower() {
+        super();
         
+        //sniper stats
+        damage = 30.0f;
+        range = 150;
+        cost = 100;
+        fireRate = 1.2f;
         //Packet texturing and sprite
-        packetTexture = new Texture("sniper.png");
-        packetSprite = new Sprite(packetTexture);
+        defaultTowerSpriteTexture = new Texture("towers/Sniper.png");
+        defaultTowerSpriteTextureShooting = new Texture("towers/SniperShoot.png");
+        defaultTowerSprite = new Sprite(defaultTowerSpriteTexture);
     }
   
         

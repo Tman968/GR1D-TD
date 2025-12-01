@@ -18,6 +18,6 @@ public class EnemyQuick extends EnemyAbstract {
      * @param gameViewport
      */
     public EnemyQuick(FitViewport gameViewport) {
-        super(gameViewport, 1,50f,1.362768f); // initializes using the EnemyAbstract contructor
+        super(gameViewport, 1,30f,1.362768f); // initializes using the EnemyAbstract contructor
     }
 }

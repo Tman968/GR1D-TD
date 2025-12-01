@@ -7,24 +7,20 @@ package com.badlogic.drop;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * A class used to translate an enemy's progress along the track to an exact coordinate position on the grid.
+ *
  * @author natha
  */
 public class EnemyCommander {
-    public final static int[][] pathData = {{3,-1},
-                                            {3,0},{3,1},{3,2},{3,3},
-                                            {4,3},{5,3},
-                                            {5,4},{5,5},
-                                            {4,5},{3,5},{2,5},{1,5},
-                                            {1,6},{1,7},
-                                            {1,8}};
+    public final static int[][] pathData = {{4,0},
+                                            {4,1},{4,2},{4,3},{4,4},
+                                            {5,4},{6,4},
+                                            {6,5},{6,6},
+                                            {5,6},{4,6},{3,6},{2,6},
+                                            {2,7},{2,8},
+                                            {2,9}};
     public final static int NUM_PATH_SEG = pathData.length-2;
     
-    /**
-     * Accepts an enemy's progress along the track and returns an its exact coordinate position on the grid.
-     * @param prog
-     * @return 
-     */
+    
     public Vector2 progToPos(float prog) {
         if (prog <= 0f) {
             return new Vector2((pathData[0][1]+pathData[1][1])/2,
