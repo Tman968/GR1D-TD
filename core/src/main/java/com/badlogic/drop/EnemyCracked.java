@@ -17,6 +17,16 @@ public interface EnemyCracked extends EnemyInterface {
      * In other words, it asks the enemy to perform whatever tasks it should every "tick".
      */
     abstract public void act();
+    
+    /**
+     * Changes an enemy's velocity based upon the position of a waypoint that it is currently touching and the next waypoint.
+     * @param waypointStart
+     * @param waypointEnd 
+     */
     abstract public void changeVelocity(Rectangle waypointStart, Rectangle waypointEnd);
+    
+    /**
+     * res
+     */
     abstract public void resetTouchDetect();
 }

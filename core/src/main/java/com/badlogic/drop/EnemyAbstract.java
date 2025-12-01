@@ -96,6 +96,10 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
         isInAnim = false;
     }
     
+    /**
+     * Updates the enemy's progress along the track based upon their speed.
+     */
+    
     protected void updateMovement() {
         float delta = Gdx.graphics.getDeltaTime();
         prog += delta*progUpdate;
@@ -165,6 +169,9 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
         //System.out.println("Velocity x = " + velocity.x + "     Velocity y = " + velocity.y);
     }
     
+    /**
+     * Sets the length of time that an enemy has been touching a waypoint to zero.
+     */
     @Override
     public final void resetTouchDetect() {touchDetectTimer = 0f;}
     
@@ -238,15 +245,32 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
     @Override
     public final boolean getIsDead() {return isDead;}
     
+    /**
+     * Returns the enemy's sprite.
+     * @return 
+     */
     @Override
     public final Sprite getEnemySprite() {return enemySprite;}
     
+    /**
+     * Return's the enemy's hitbox.
+     * @return 
+     */
     @Override
     public final Rectangle getHitbox() {return enemyRectangle;}
     
+    
+    /**
+     * Returns true if the enemy is mid-animation.
+     * @return 
+     */
     @Override
     public final boolean getIsInAnim() {return isInAnim;}
     
+    /**
+     * Returns the time that an enemy has been touching a waypoint.
+     * @return 
+     */
     @Override
     public final float getTouchDetect() {return touchDetectTimer;}
     
