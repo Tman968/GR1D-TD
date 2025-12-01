@@ -7,7 +7,7 @@ package com.badlogic.drop;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
- * A quick enemy type.
+ * A quick but weak enemy type.
  * Extends EnemyAbstract.
  * @author natha
  */

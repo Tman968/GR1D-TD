@@ -26,7 +26,7 @@ public interface EnemyCracked extends EnemyInterface {
     abstract public void changeVelocity(Rectangle waypointStart, Rectangle waypointEnd);
     
     /**
-     * res
+     * Sets the amount of time that an enemy has been touching a waypoint to zero.
      */
     abstract public void resetTouchDetect();
 }

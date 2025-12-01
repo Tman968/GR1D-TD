@@ -47,11 +47,27 @@ public interface EnemyInterface {
      */
     abstract public boolean getIsDead();
     
+    /**
+     * Returns the hitbox of the enemy.
+     * @return 
+     */
     abstract public Rectangle getHitbox();
     
+    /**
+     * Returns the sprite of the enemy.
+     * @return 
+     */
     abstract public Sprite getEnemySprite();
     
+    /**
+     * Returns true if the enemy is mid-animation.
+     * @return 
+     */
     abstract public boolean getIsInAnim();
     
+    /**
+     * Returns the time that an enemy has been touching a waypoint.
+     * @return 
+     */
     abstract public float getTouchDetect();
 }

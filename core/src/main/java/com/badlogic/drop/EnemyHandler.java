@@ -25,6 +25,12 @@ public class EnemyHandler {
     
     FitViewport viewport;
     
+    
+    /**
+     * Constructor for EnemyHandler.
+     * Takes in game viewport so enemies can draw themselves.
+     * @param gameViewport 
+     */
     public EnemyHandler(FitViewport gameViewport) {
         viewport = gameViewport;
         
@@ -197,8 +203,18 @@ public class EnemyHandler {
         return outList;
     }
     
+    
+    /**
+     * Returns the total number of enemies on the grid.
+     * @return 
+     */
     public int getNumEnemies() {return enemyList.size();}
     
+    /**
+     * Returns the number of enemies of a given type.
+     * @param id
+     * @return 
+     */
     public int getNumEnemiesType(int id) {
         if ((id >= 0) && (id <= NUM_ENEMY_TYPES-1)) {
             return enemyTypeLists[id].size();
@@ -207,5 +223,10 @@ public class EnemyHandler {
         }
     }
     
+    /**
+     * Returns the number of enemies on a given path segment.
+     * @param index
+     * @return 
+     */
     public int getNumEnemiesPathSegment(int index) {return path[index].size();}
 }

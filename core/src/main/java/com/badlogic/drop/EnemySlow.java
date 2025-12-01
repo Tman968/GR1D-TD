@@ -7,7 +7,7 @@ package com.badlogic.drop;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
- *
+ * A slow but healthy type of enemy.
  * @author natha
  */
 public class EnemySlow extends EnemyAbstract {

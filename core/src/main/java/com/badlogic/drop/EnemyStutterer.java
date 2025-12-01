@@ -8,7 +8,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
- *
+ * A slow and jittery but tough enemy type.
  * @author natha
  */
 public class EnemyStutterer extends EnemyAbstract {

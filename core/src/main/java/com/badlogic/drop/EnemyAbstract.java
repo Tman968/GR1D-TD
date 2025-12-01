@@ -190,14 +190,18 @@ public abstract class EnemyAbstract implements EnemyInterface,EnemyCracked {
         activateDamageAnimation();
     }
     
-    // Activate Damage Animation
+    /**
+     * Start damage animation.
+     */
     protected void activateDamageAnimation() {
         enemySprite.setTexture(enemyDamageTexture);
         isInAnim = true;
         
     }
     
-    // Update Damage Animation
+    /**
+     * Update damage animation.
+     */
     protected void updateDamageAnimation() {
         if (animTime > 0.2f) {
             enemySprite.setTexture(enemyTexture);
