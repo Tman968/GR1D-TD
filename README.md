@@ -1,6 +1,6 @@
 # Note: Use this Readme for testing the other program, other README files (if any) may be ignored 
 # GR1D-TD Simple Startup Guide
-# 1. Go to the .jar file in location (add location) and start the program
+# 1. Go to the .jar file in location ((your file directory to project)...\GR1D-TD\lwjgl3\build\libs) and start the program
 # 2. If that does not work, launch the program from Netbeans
 # 3. Select a tower (Either Minigun or Sniper) from the shop on the right side of the screen
 # 4. Place the tower by clicking any of the green outlined squares with a black center
