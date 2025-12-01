@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import java.util.LinkedList;
 
@@ -18,10 +19,33 @@ import java.util.LinkedList;
 public class EnemyHandler {
     public final int NUM_PATH_SEGMENTS = 14;
     public static final int NUM_ENEMY_TYPES = 3;
+    public static final int MAX_NUM_ENEMIES = 100; // the max number of enemies of each enemy type that can exist
+    
+    // the percentage of each enemy type spawned at the start of the game; should sum to 1 and contain NUM_ENEMY_TYPES entries
+    public static final float[] I_ENEMY_PROPORTIONS = {0.7f,0.2f,0.1f};
+    // the percentage of each enemy type spawned at the end of the game; should sum to 1 and contain NUM_ENEMY_TYPES entries
+    public static final float[] F_ENEMY_PROPORTIONS = {0.1f,0.6f,0.3f};
+    // the rate of enemy spawns at the start of the game; must be above 0
+    public static final float I_ENEMY_SPAWN_RATE = 0.3f;
+    // the rate of enemy spawns at the end of the game; must be above 0, and should be above I_ENEMY_SPAWN_RATE
+    public static final float F_ENEMY_SPAWN_RATE = 3f;
+    // how much time passes until the final phase of the game starts; must be greater than 1
+    public static final float END_GAME_START = 100f;
+    // how much time passes until the game ends; must be greater than END_GAME_START
+    public static final float END_GAME_END = 120f;
     
     private LinkedList<EnemyCracked> enemyList = new LinkedList();
     private LinkedList<EnemyCracked>[] path = new LinkedList[NUM_PATH_SEGMENTS];
     private LinkedList<EnemyCracked>[] enemyTypeLists = new LinkedList[NUM_ENEMY_TYPES];
+    
+    // linearly increases from 0 to 1 until the start of the final phase of the game
+    private float difficulty;
+    // linearly increases from I_ENEMY_SPAWN_RATE to F_ENEMY_SPAWN_RATE as difficulty increases
+    private float spawnRate;
+    // the percentage of each enemy type spawned
+    private float[] enemyProportions;
+    // the amount of time until the next instance of each enemy type spawns; calculated from the proper enemy proportions as dictated by I_ENEMY_PROPORTIONS and F_ENEMY_PROPORTIONS
+    private float[] spawnCooldowns;
     
     FitViewport viewport;
     
@@ -33,17 +57,50 @@ public class EnemyHandler {
      */
     public EnemyHandler(FitViewport gameViewport) {
         viewport = gameViewport;
+        difficulty = 0;
+        spawnRate = I_ENEMY_SPAWN_RATE;
         
         for (int i = 0; i<=NUM_PATH_SEGMENTS-1;i++) {
             path[i] = new LinkedList();
         }
         
+        enemyProportions = new float[NUM_ENEMY_TYPES];
+        spawnCooldowns = new float[NUM_ENEMY_TYPES];
         for (int i = 0; i<=NUM_ENEMY_TYPES-1;i++) {
             enemyTypeLists[i] = new LinkedList();
+            enemyProportions[i] = I_ENEMY_PROPORTIONS[i];
+            spawnCooldowns[i] = 1 / I_ENEMY_PROPORTIONS[i];
         }
     }
     
     
+    /**
+     * Spawns enemies as appropriate for previously defined difficulty variation.
+     */
+    private void spawnEnemies() {
+        float delta = Gdx.graphics.getDeltaTime();
+        if (difficulty < 1) {
+            spawnRate = ((1f - difficulty) * I_ENEMY_SPAWN_RATE) + (difficulty * F_ENEMY_SPAWN_RATE);
+            for (int i = 0; i <= NUM_ENEMY_TYPES-1;i++){
+                enemyProportions[i] = ((1f - difficulty) * I_ENEMY_PROPORTIONS[i]) + (difficulty * F_ENEMY_PROPORTIONS[i]);
+            }
+            difficulty += delta / END_GAME_START;
+        } else if (difficulty >= 1) {
+            spawnRate = F_ENEMY_SPAWN_RATE;
+            for (int i = 0; i <= NUM_ENEMY_TYPES-1;i++){
+                enemyProportions[i] = F_ENEMY_PROPORTIONS[i];
+            }
+        }
+        
+        for (int i = 0; i <= NUM_ENEMY_TYPES-1; i++) {
+            if ((spawnCooldowns[i] <= 0) & (getNumEnemiesType(i) < MAX_NUM_ENEMIES)) {
+                spawn(i);
+                spawnCooldowns[i] = 1 / enemyProportions[i];
+            }
+            spawnCooldowns[i] -= delta * spawnRate;
+        }
+        
+    }
     
     /**
      * Sorts one enemy forwards.
@@ -88,7 +145,7 @@ public class EnemyHandler {
      * Spawns an enemy, with enemy type indicated by the given ID.
      * @param enemyID 
      */
-    public void spawn(int enemyID) {
+    private void spawn(int enemyID) {
         EnemyCracked newEnemy;
         switch (enemyID) {
             case 0:
@@ -120,6 +177,8 @@ public class EnemyHandler {
         int newPathSegment;
         int numFirewallHits = 0;
         EnemyCracked currEnemy;
+        
+        spawnEnemies();
         
         for (int currPathSegment = NUM_PATH_SEGMENTS - 1; currPathSegment >= 0; currPathSegment--) {
             numEnemies = path[currPathSegment].size();

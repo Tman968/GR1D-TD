@@ -419,22 +419,7 @@ public class Play implements Screen {
         timerVar += delta;
         timerPrint += delta;
         attackTimer += delta;
-        spawnCDEnemySlow -= delta;
-        spawnCDEnemyQuick -= delta;
-        spawnCDEnemyStutterer -= delta;
         
-        if (spawnCDEnemySlow <= 0f & enemyHandler.getNumEnemiesType(0) < 4) {
-            enemyHandler.spawn(0);
-            spawnCDEnemySlow = 3f;
-        }
-        if (spawnCDEnemyQuick <= 0f & enemyHandler.getNumEnemiesType(1) < 4) {
-            enemyHandler.spawn(1);
-            spawnCDEnemyQuick = 7f;
-        }
-        if (spawnCDEnemyStutterer <= 0f & enemyHandler.getNumEnemiesType(2) < 4) {
-            enemyHandler.spawn(2);
-            spawnCDEnemyStutterer = 10f;
-        }
      
         
         
