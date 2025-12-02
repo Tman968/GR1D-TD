@@ -10,6 +10,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -25,6 +27,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import java.util.LinkedList;
 
 
@@ -48,6 +53,15 @@ public class Play implements Screen {
     //Movement update variable(s)
     float timerVar;
     boolean spriteOverlapWaypoint;
+    
+    // set up table for tower interaction
+    private Table towerTable;
+    ImageButton.ImageButtonStyle deleteTowerButtonStyle;
+    ImageButton deleteTowerButton;
+    
+    // Track which tile is currently selected
+    private int selectedTileX = -1;
+    private int selectedTileY = -1;
     
     EnemyHandler enemyHandler;
     
@@ -92,6 +106,7 @@ public class Play implements Screen {
     
     // Tower Management
     private Array<Tower> towers = new Array<>();
+    private Tower[][] towerGrid;
     private Texture towerTexture;
     
     
@@ -110,6 +125,34 @@ public class Play implements Screen {
         pauseButton.setSize(40,40);
         
         gameState = GameState.INGAME;
+        
+        // tower table properties
+        deleteTowerButtonStyle = new ImageButton.ImageButtonStyle();
+        // tableButtonFont
+        //BitmapFont tableButtonfont = new BitmapFont();
+        //towerButtonStyle.font = tableButtonfont;
+        // towerButton Texture
+        deleteTowerButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture("towerHandler/deleteButtonUp.png")));
+        deleteTowerButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture("towerHandler/deleteButtonDown.png")));
+        deleteTowerButton = new ImageButton(deleteTowerButtonStyle);
+
+        // delete button listener
+        deleteTowerButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+                // Remove tower from towerGrid array
+                towerGrid[selectedTileX][selectedTileY] = null;
+                // Parse through towers, deleting the tower that matches the tile
+                for (Tower tower : towers) {
+                    if (tower.getTileX() == selectedTileX && tower.getTileY() == selectedTileY) {
+                        shop.sellTower(tower.towerType);
+                        towers.removeValue(tower, true);
+                    }
+                }
+                towerTable.setVisible(false); // Close the menu after selection
+                System.out.println("Tower deleted at: " + selectedTileX + "," + selectedTileY);
+            }
+        });
         
         //Tanner added
         spriteBatch = new SpriteBatch();
@@ -164,6 +207,9 @@ public class Play implements Screen {
         int mapWidthinTiles = layer.getWidth();
         int mapHeightinTiles = layer.getHeight();
         
+        // Initialize towerGrid with new mapwidth and height
+        towerGrid = new Tower[mapWidthinTiles][mapHeightinTiles];
+        
         // Calculate world dimensiions in pixels
         float mapWidth = mapWidthinTiles * tileWidth;
         float mapHeight = mapHeightinTiles * tileHeight;
@@ -216,6 +262,16 @@ public class Play implements Screen {
             
         });
         
+        // Tower Handler Table
+        towerTable = new Table();
+        towerTable.setSize(150, 100);
+        
+        towerTable.add(deleteTowerButton).size(56, 18);
+        
+        stage.addActor(towerTable);
+        
+        towerTable.setVisible(false);
+        
     }
 
     @Override
@@ -228,9 +284,11 @@ public class Play implements Screen {
             viewport.apply();
             camera.update();
 
+            // Render Map
             renderer.setView(camera);
             renderer.render();
 
+            // Handle Input
             if (Gdx.input.justTouched()){
                 handleTowerPlacement();
             }
@@ -263,18 +321,27 @@ public class Play implements Screen {
             
         
     }
-    
+     
     private void handleTowerPlacement(){
         //Get mouse position
         int mouseX = Gdx.input.getX();
         int mouseY = Gdx.input.getY();
         
+        // Convert the mouse click to Stage coordinates (UI coordinates)
+        Vector2 stageCoord = stage.screenToStageCoordinates(new Vector2(mouseX, mouseY));
+
+        // Check if the click hit any Actor (namely delete button) on the Stage
+        Actor hitActor = stage.hit(stageCoord.x, stageCoord.y, true);
+
+        // If an UI element is hit, don't place tower
+        if (hitActor != null) {
+            return;
+        }
         
         // Converts screen coords to world coords
-        Vector3 worldCoords = viewport.unproject(new Vector3(mouseX, mouseY,0));
+        Vector3 worldCoords = viewport.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(),0));
         
-        
-         // If click is in the shop area, handle the tower selection
+        // If click is in the shop area, handle the tower selection
         if (worldCoords.x >= shopStartX){
             shop.handleTouch(mouseX, mouseY);
             return; // Doesn't try to place the tower
@@ -286,46 +353,96 @@ public class Play implements Screen {
             return;
         }
         
-        
         // Converts world coords to tile coords
-        int tileX = (int) Math.floor(worldCoords.x /  tileWidth);
+        int tileX = (int) Math.floor(worldCoords.x / tileWidth);
         int tileY = (int) Math.floor(worldCoords.y / tileHeight);
-       
         
+        // Bounds check to prevent crash if clicking outside map area
+        if (tileX < 0 || tileY < 0 || tileX >= towerGrid.length || tileY >= towerGrid[0].length) {
+            towerTable.setVisible(false);
+            return;
+        }
+       
         // debug lines
         System.out.println("Screen: (" + mouseX + ", " + mouseY + ")");
         System.out.println("World: (" + worldCoords.x + ", " + worldCoords.y + ")");
         System.out.println("Tile: (" + tileX + ", " + tileY + ")");
         System.out.println("World bounds - Width: " + (viewport.getWorldWidth()) + ", Height: " + (viewport.getWorldHeight()));
-       
+        
         
        
-        
-        // Checks if the tile is buildable
-        if(isBuildable(tileX, tileY)){
-            int selectedType = shop.getSelectedTowerType();
-        
-             // Attempt to purchase the tower
-            if (shop.purchaseTower(selectedType)) {
-                Tower tower = createTowerFromSelection(selectedType);
-            
-            if (tower != null){
-                tower.setPosition(tileX * tileWidth, tileY * tileHeight, tileWidth);
-                towers.add(tower);
-                System.out.println("Tower placed at tile: " + tileX + ", " + tileY);
-                shop.clearSelection();
+        // All the logic for interacted with the tile after clicking
+        // First: check if the tile is an interactable Tower tile, vs a useless Enemy tile
+        if (detectTowerTile(tileX, tileY)) {
+            // Second: check if a tower is at the tile
+            if (isTileEmpty(tileX, tileY)) {
+                // If tile is empty, Place tower
+                int selectedType = shop.getSelectedTowerType();
+                // Attempt to purchase the tower
+                if (shop.purchaseTower(selectedType)) {
+                    Tower tower = createTowerFromSelection(selectedType);
+                    
+                    tower.setPosition(tileX * tileWidth, tileY * tileHeight, tileWidth);
+                    towers.add(tower);
+                    towerGrid[tileX][tileY] = tower;
+                
+                    // Hide menu if we just placed a tower
+                    towerTable.setVisible(false);
+                
+                    System.out.println("Tower placed at the tile: " + tileX + ", " + tileY);
+                }
+            } 
+            // If tile is not empty, show menu
+            else {
+                // Change selected tiles
+                selectedTileX = tileX;
+                selectedTileY = tileY;
+                
+                // Move Table
+                towerTable.setX(tileX * tileWidth);
+                towerTable.setY(tileY * tileHeight);
+                towerTable.setVisible(true);
             }
-        } else {
-            System.out.println("Not enough credits to purchase this tower!");
-        } 
-        
-        }else {
-        System.out.println("ERR0R. CANN0T BUILD!");
         }
+        else {
+            // Clicked invalid area, hide menu
+            towerTable.setVisible(false);
         }
-            
+    }
          
-
+ // Dectect if specified Tile is Enemy or Tower Tile
+    // If EnemyTile, return false
+    // If TowerTile, return true
+    private boolean detectTowerTile (int tileX, int tileY)
+    {
+        // Get the buildable layer from the map
+        // This is layer 1 from the tmx file
+        TiledMapTileLayer buildableLayer = (TiledMapTileLayer) map.getLayers().get(1);
+        
+        // Check if the tile exists
+        TiledMapTileLayer.Cell cell = buildableLayer.getCell(tileX, tileY);
+        if (cell == null || cell.getTile() == null) {
+            System.out.println("ERROR. CANNOT BUILD! THIS TILE DOESN'T EXIST!");
+            // If Enemy Tile, return false
+            return false;
+        }
+        // If tile exists, get the id of the selected tile
+        int tileId = cell.getTile().getId();
+        System.out.println("Tile ID at (" + tileX + ", " + tileY + "): " + tileId);
+        // Check if tile id is an enemy (value of 3) or tower (value of 1) tile
+        if (tileId == 3) {
+            System.out.println("ERROR. CANNOT BUILD! THIS TILE IS AN ENEMY TILE!");
+            return false;
+        }
+        return true;
+    }
+    
+    // Check if Tile has a Tower currently there
+    private boolean isTileEmpty (int tileX, int tileY)
+    {
+        // Return bool based on if tile is empty
+        return towerGrid[tileX][tileY] == null;    
+    }
 
     private Tower createTowerFromSelection(int towerType) {
         switch (towerType) {
@@ -341,44 +458,6 @@ public class Play implements Screen {
         }
     }
 
-    private boolean isBuildable(int tileX, int tileY){
-        // Get the buildable layer from the map
-        TiledMapTileLayer buildableLayer = (TiledMapTileLayer) map.getLayers().get(1);
-        
-     
-        
-        // Check if there's a buildable tile at thid position
-        TiledMapTileLayer.Cell cell = buildableLayer.getCell(tileX, tileY);
-        if (cell == null || cell.getTile() == null) return false;
-        
-        
-        int tileId = cell.getTile().getId();
-        
-        System.out.println("Tile ID at (" + tileX + ", " + tileY + "): " + tileId);
-        
-        // Check if a tower already exists here
-        for (Tower tower : towers) {
-            if (tower.getTileX() == tileX && tower.getTileY() == tileY){
-                
-                return false;
-            }
-        }
-        
-        // Checks if the tile is an enemy tile 
-        if (tileId == 3){
-            
-         
-            
-            return false;
-        }
-         
-       
-        
-        
-        
-        
-        return true;
-    }
     
     @Override
     public void resize(int width, int height){ 
@@ -392,43 +471,15 @@ public class Play implements Screen {
         
     }
 
-    @Override
-    public void pause() {
-        
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
-    public void hide() {
-    }
-
-    @Override
-    public void dispose() {
-        map.dispose();
-        renderer.dispose();
-        shop.dispose();
-    }
-    
-    
-    
     //Tanner added main methods
     private void logic() {
         float delta = Gdx.graphics.getDeltaTime();
         timerVar += delta;
         timerPrint += delta;
         attackTimer += delta;
-     
-        
-        
-        
-    
        
         int numFirewallHits = enemyHandler.action();
        
-        
         // Apply damage to firewall for each enemy that reached the end
         if (numFirewallHits > 0) {
             int damagePerEnemy = 10; // Each enemy deals 10 HP damage
@@ -510,5 +561,24 @@ public class Play implements Screen {
         
         spriteBatch.end();
     }
-    
+
+@Override
+    public void pause() {
+        
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
+
+    @Override
+    public void dispose() {
+        map.dispose();
+        renderer.dispose();
+        shop.dispose();
+    }
 }

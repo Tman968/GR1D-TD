@@ -22,6 +22,7 @@ public class Tower {
     float fireRate; //int correct type? maybe float?
     Vector2 location;
     boolean isHacked;
+    int towerType;
     
     // Tile Position
     protected int tileX;
@@ -64,6 +65,7 @@ public class Tower {
         location = new Vector2();
         animTime = 0f;
         isInAnim = false;
+        int towerType = 0;
     }
 
     

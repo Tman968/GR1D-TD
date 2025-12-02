@@ -30,6 +30,8 @@ public class Shop {
     private Texture shopBackTexture;
     private Texture minigunIcon;
     private Texture sniperIcon;
+    private Texture minigunSelected;
+    private Texture sniperSelected;
     private Texture empIcon;
     
     // Shop button rectangles for click detection
@@ -81,6 +83,8 @@ public class Shop {
         // Initialize textures
         minigunIcon = new Texture("towers/GR1D_Turret_1.png");
         sniperIcon = new Texture("towers/Sniper.png");
+        minigunSelected = new Texture("towers/GR1D_Turret_Selected.png");
+        sniperSelected = new Texture("towers/Sniper_Selected.png");
         
         // Initialize buttons
         float startY = shopY + shopHeight - buttonHeight - buttonPadding;
@@ -124,14 +128,11 @@ public class Shop {
             System.out.println("Sniper Selected");
             return true;
         }
-        
-        
-        
-        
+
         return false;
     }
     
-        /**
+     /**
      * Attempt to purchase a tower
      * @param towerType The type of tower to purchase
      * @return true if purchase was successful, false if not enough currency
@@ -143,6 +144,15 @@ public class Shop {
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Sell a tower
+     * @param towerType The type of tower to sell
+     */
+    public void sellTower(int towerType) {
+        int towerCost = getTowerCost(towerType);
+        playerCurrency += (towerCost/2);
     }
 
     /**
@@ -179,9 +189,25 @@ public class Shop {
         // Draws shop background
         
         //draw tower buttons
-        batch.draw(minigunIcon, minigunButton.x, minigunButton.y, minigunButton.width, minigunButton.height);
-        
-        batch.draw(sniperIcon, sniperButton.x, sniperButton.y, sniperButton.width, sniperButton.height);
+        if(selectedTower == 1)
+        {
+            batch.draw(minigunSelected, minigunButton.x, minigunButton.y, minigunButton.width, minigunButton.height);
+
+            batch.draw(sniperIcon, sniperButton.x, sniperButton.y, sniperButton.width, sniperButton.height);
+        }
+        else if(selectedTower == 2)
+        {
+            batch.draw(minigunIcon, minigunButton.x, minigunButton.y, minigunButton.width, minigunButton.height);
+
+            batch.draw(sniperSelected, sniperButton.x, sniperButton.y, sniperButton.width, sniperButton.height);
+        }
+        else
+        {
+            batch.draw(minigunIcon, minigunButton.x, minigunButton.y, minigunButton.width, minigunButton.height);
+
+            batch.draw(sniperIcon, sniperButton.x, sniperButton.y, sniperButton.width, sniperButton.height);
+        }
+       
         
         // Draw labels and costs
         font.draw(batch, "Minigun", minigunButton.x + buttonWidth + 10, minigunButton.y + buttonHeight/2 + 15);
@@ -252,9 +278,6 @@ public class Shop {
         empIcon.dispose();
         font.dispose();
     }
-    
-    
-    
     
     
 }

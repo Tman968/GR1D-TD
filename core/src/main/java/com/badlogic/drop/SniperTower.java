@@ -31,6 +31,7 @@ public class SniperTower extends Tower {
         range = 150;
         cost = 100;
         fireRate = 1.2f;
+        towerType = 2;
         //Packet texturing and sprite
         defaultTowerSpriteTexture = new Texture("towers/Sniper.png");
         defaultTowerSpriteTextureShooting = new Texture("towers/SniperShoot.png");
