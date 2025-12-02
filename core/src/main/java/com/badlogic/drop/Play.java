@@ -7,6 +7,7 @@ package com.badlogic.drop;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -31,8 +32,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import java.util.LinkedList;
-
-
 
 /**
  *
@@ -75,6 +74,8 @@ public class Play implements Screen {
     
     LinkedList<EnemyInterface> enemyList;
     
+    Music pauseMenu = Gdx.audio.newMusic(Gdx.files.internal("music/pause_menu.mp3"));
+    Music glitchSound = Gdx.audio.newMusic(Gdx.files.internal("music/glitchSound.mp3"));
     
     SpriteBatch spriteBatch;
     
@@ -86,7 +87,6 @@ public class Play implements Screen {
     float attackTimer;
     
     //End Tanner added
-    
     private float shopStartX;
     private int shopWidth;
     private float mapWidth;
@@ -108,7 +108,6 @@ public class Play implements Screen {
     private Array<Tower> towers = new Array<>();
     private Tower[][] towerGrid;
     private Texture towerTexture;
-    
     
     //Map properties
     private int tileWidth;
@@ -179,10 +178,8 @@ public class Play implements Screen {
             System.out.println(prog + "-" + (prog+0.5f) % 1f + ": (" + enemyCommand.progToPos(prog).x + "," + enemyCommand.progToPos(prog).y + ")");
             prog += 0.052313f;
         }
-        
     }
     
-
     @Override
     public void show() {
         
@@ -191,12 +188,11 @@ public class Play implements Screen {
         TmxMapLoader loader = new TmxMapLoader();
         map = loader.load("maps/gridLayout.tmx");
         
-   
-        
        // Shop width in pixels variable
         shopWidth = 350;
         
-       
+        pauseMenu.setLooping(true);
+        pauseMenu.play();  
         
         // Get tile dimensions from map
         tileWidth =map.getProperties().get("tilewidth", Integer.class);
@@ -226,8 +222,6 @@ public class Play implements Screen {
         
         shop = new Shop(shopStartX, 0, shopWidth, mapHeight, viewport);
         
-        
-        
         //Tanner added
         enemyHandler = new EnemyHandler(viewport);
         
@@ -236,8 +230,6 @@ public class Play implements Screen {
         camera.update();
         
         renderer = new OrthogonalTiledMapRenderer(map);
-        
-   
         
         // Initialize tower array
         towers = new Array<>();
@@ -255,11 +247,12 @@ public class Play implements Screen {
            public void clicked(InputEvent event, float x, float y) {
                if (gameState == GameState.INGAME) {
                    gameState = GameState.PAUSED;
+                   pauseMenu.pause();
                } else if (gameState == GameState.PAUSED) {
                    gameState = GameState.INGAME;
+                   pauseMenu.play();
                }
            }
-            
         });
         
         // Tower Handler Table
@@ -271,7 +264,6 @@ public class Play implements Screen {
         stage.addActor(towerTable);
         
         towerTable.setVisible(false);
-        
     }
 
     @Override
@@ -307,7 +299,9 @@ public class Play implements Screen {
             stage.draw();
             if(firewall.isDestroyed()) {
                 renderer.getBatch().draw(BSODTexture, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
-        }
+                pauseMenu.pause();
+                glitchSound.play();
+            }
           
             renderer.getBatch().end();
         } else if (gameState == GameState.PAUSED) {
@@ -317,9 +311,6 @@ public class Play implements Screen {
             System.out.println("Something broke, in invalid gameState. Terminating");
             Gdx.app.exit();
         }
-        
-            
-        
     }
      
     private void handleTowerPlacement(){
@@ -368,8 +359,6 @@ public class Play implements Screen {
         System.out.println("World: (" + worldCoords.x + ", " + worldCoords.y + ")");
         System.out.println("Tile: (" + tileX + ", " + tileY + ")");
         System.out.println("World bounds - Width: " + (viewport.getWorldWidth()) + ", Height: " + (viewport.getWorldHeight()));
-        
-        
        
         // All the logic for interacted with the tile after clicking
         // First: check if the tile is an interactable Tower tile, vs a useless Enemy tile
@@ -458,7 +447,6 @@ public class Play implements Screen {
         }
     }
 
-    
     @Override
     public void resize(int width, int height){ 
        viewport.update(width,height, true);
@@ -467,8 +455,7 @@ public class Play implements Screen {
       camera.viewportWidth = width;
       camera.viewportHeight = height;
       camera.update();
-        */
-        
+        */ 
     }
 
     //Tanner added main methods
@@ -531,8 +518,6 @@ public class Play implements Screen {
                     }
             }
         }
-        
-        
     }
     
     private void draw() {
@@ -563,8 +548,7 @@ public class Play implements Screen {
     }
 
 @Override
-    public void pause() {
-        
+    public void pause() {    
     }
 
     @Override
@@ -580,5 +564,7 @@ public class Play implements Screen {
         map.dispose();
         renderer.dispose();
         shop.dispose();
+        pauseMenu.dispose();   
+        glitchSound.dispose();
     }
 }
